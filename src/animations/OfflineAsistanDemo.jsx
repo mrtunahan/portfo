@@ -66,7 +66,7 @@ function GlowOrb({ x, y, size, color, delay = 0 }) {
 
 function HeroLine() {
   const { localTime, duration } = useSprite();
-  const width = interpolate([0.15, 0.75, 1.2], [0, 150, 260], Easing.easeInOutCubic)(localTime);
+  const width = interpolate([0.15, 0.95, 1.6], [0, 180, 290], Easing.easeInOutCubic)(localTime);
   const exitStart = Math.max(0, duration - 0.5);
   const opacity = 1 - clamp((localTime - exitStart) / 0.4, 0, 1);
   return (
@@ -88,7 +88,7 @@ function HeroLine() {
 
 function LivePill() {
   const { localTime, duration } = useSprite();
-  const enter = Easing.easeOutBack(clamp((localTime - 0.9) / 0.55, 0, 1));
+  const enter = Easing.easeOutBack(clamp((localTime - 1.1) / 0.6, 0, 1));
   const exitStart = Math.max(0, duration - 0.45);
   const exit = clamp((localTime - exitStart) / 0.4, 0, 1);
   return (
@@ -150,7 +150,7 @@ function Panel({ x, y, width, height, children }) {
 
 function FakeScreen() {
   const { localTime } = useSprite();
-  const progress = clamp(localTime / 1.6, 0, 1);
+  const progress = clamp(localTime / 2.4, 0, 1);
   const barWidth = interpolate([0, 0.5, 1], [0, 120, 210], Easing.easeInOutCubic)(progress);
   return (
     <div
@@ -216,7 +216,7 @@ function FakeScreen() {
 
 function FlowBeam() {
   const { localTime, duration } = useSprite();
-  const x = interpolate([0, 0.5, 1.2, 1.7], [120, 250, 470, 720], Easing.easeInOutSine)(localTime);
+  const x = interpolate([0, 1.0, 2.2, 3.2], [120, 250, 470, 720], Easing.easeInOutSine)(localTime);
   const exitStart = Math.max(0, duration - 0.45);
   const opacity = 1 - clamp((localTime - exitStart) / 0.4, 0, 1);
   return (
@@ -247,7 +247,7 @@ function FlowBeam() {
   );
 }
 
-function MetricCard({ x, y, label, value, accent, delay }) {
+function MetricCard({ x, y, label, value, accent, delay, hint }) {
   const { localTime, duration } = useSprite();
   const exitStart = Math.max(0, duration - 0.5);
   const entryT = Easing.easeOutCubic(clamp((localTime - delay) / 0.7, 0, 1));
@@ -259,7 +259,7 @@ function MetricCard({ x, y, label, value, accent, delay }) {
       <div style={{ position:'absolute', left:x, top:y, width:200, height:118, background:'rgba(3,16,38,0.82)', borderRadius:18, border:`1px solid ${accent}33`, boxShadow:`0 20px 40px ${accent}18`, opacity, transform:`translateY(${rise}px)`, willChange:'transform,opacity' }} />
       <div style={{ position:'absolute', left:x+18, top:y+20, color:'rgba(144,224,239,0.45)', fontSize:11, letterSpacing:'0.08em', textTransform:'uppercase', opacity }}>{label}</div>
       <div style={{ position:'absolute', left:x+18, top:y+50, color:'#f4fbff', fontSize:28, fontWeight:800, opacity }}>{value}</div>
-      <div style={{ position:'absolute', left:x+18, top:y+84, color:accent, fontSize:12, fontWeight:700, opacity }}>anlık süreç görünürlüğü</div>
+      <div style={{ position:'absolute', left:x+18, top:y+84, color:accent, fontSize:12, fontWeight:700, opacity }}>{hint || 'anlık süreç görünürlüğü'}</div>
     </>
   );
 }
@@ -297,6 +297,262 @@ function TechChip({ x, y, label, color, delay }) {
   );
 }
 
+/* ─────────── NEW: Belge Akış Süreci (Workflow diagram) ─────────── */
+function FlowNode({ x, title, status, delay, accent }) {
+  const { localTime, duration } = useSprite();
+  const exitStart = Math.max(0, duration - 0.5);
+  const entryT = Easing.easeOutBack(clamp((localTime - delay) / 0.55, 0, 1));
+  const exitT  = clamp((localTime - exitStart) / 0.4, 0, 1);
+  const opacity = localTime > delay ? clamp((localTime - delay) / 0.3, 0, 1) * (1 - exitT) : 0;
+  const rise = (1 - entryT) * 22;
+  return (
+    <>
+      <div style={{
+        position:'absolute', left:x, top:200, width:170, height:170,
+        background:'rgba(3,16,38,0.82)',
+        border:`1px solid ${accent}44`,
+        borderRadius:20,
+        boxShadow:`0 18px 40px ${accent}22`,
+        opacity, transform:`translateY(${rise}px)`,
+      }} />
+      <div style={{
+        position:'absolute', left:x+58, top:222, width:54, height:54,
+        borderRadius:'50%',
+        background:`radial-gradient(circle, ${accent}40, ${accent}10 70%)`,
+        border:`1px solid ${accent}66`,
+        opacity, transform:`translateY(${rise}px)`,
+        display:'flex', alignItems:'center', justifyContent:'center',
+        color: accent, fontSize: 22, fontWeight: 800,
+        fontFamily:'"JetBrains Mono", ui-monospace, monospace',
+      }}>
+        {title.charAt(0)}
+      </div>
+      <div style={{
+        position:'absolute', left:x, top:296, width:170,
+        textAlign:'center', color:'#f0fbff', fontSize:16, fontWeight:800,
+        opacity, transform:`translateY(${rise}px)`,
+      }}>{title}</div>
+      <div style={{
+        position:'absolute', left:x, top:320, width:170,
+        textAlign:'center', color: accent, fontSize:11, fontWeight:700,
+        letterSpacing:'0.08em', textTransform:'uppercase',
+        opacity, transform:`translateY(${rise}px)`,
+      }}>{status}</div>
+    </>
+  );
+}
+
+function FlowArrow({ x, delay }) {
+  const { localTime, duration } = useSprite();
+  const exitStart = Math.max(0, duration - 0.5);
+  const grow = clamp((localTime - delay) / 0.5, 0, 1);
+  const exitT = clamp((localTime - exitStart) / 0.4, 0, 1);
+  const opacity = grow * (1 - exitT);
+  return (
+    <div style={{
+      position:'absolute', left:x, top:284, width:46, height:2,
+      background:`linear-gradient(90deg, transparent, ${ACCENT}, transparent)`,
+      transform:`scaleX(${grow})`, transformOrigin:'left center',
+      opacity,
+    }}>
+      <div style={{
+        position:'absolute', right:-2, top:-3,
+        width:8, height:8,
+        borderRight:`2px solid ${ACCENT}`,
+        borderTop:`2px solid ${ACCENT}`,
+        transform:'rotate(45deg)',
+      }} />
+    </div>
+  );
+}
+
+function FlowPulse({ delay }) {
+  const { localTime, duration } = useSprite();
+  const exitStart = Math.max(0, duration - 0.5);
+  const start = delay;
+  const period = 2.6;
+  const t = ((localTime - start) % period) / period;
+  const inWindow = localTime > start && localTime < exitStart;
+  if (!inWindow) return null;
+  // 4 stations at x = 100, 312, 524, 736 (center of nodes at x+85)
+  const positions = [185, 397, 609, 821];
+  const segs = positions.length - 1;
+  const segT = t * segs;
+  const segIdx = clamp(Math.floor(segT), 0, segs - 1);
+  const localSeg = segT - segIdx;
+  const px = positions[segIdx] + (positions[segIdx+1] - positions[segIdx]) * localSeg;
+  const opacity = Math.sin(t * Math.PI) * 0.9;
+  return (
+    <div style={{
+      position:'absolute', left:px - 8, top:276, width:16, height:16,
+      borderRadius:'50%',
+      background:`radial-gradient(circle, ${ACCENT_SOFT}, ${ACCENT}00 70%)`,
+      boxShadow:`0 0 18px ${ACCENT}cc`,
+      opacity, pointerEvents:'none',
+    }}/>
+  );
+}
+
+/* ─────────── NEW: Rol Bazlı Yetkilendirme ─────────── */
+function RoleCard({ x, role, color, badge, perms, delay }) {
+  const { localTime, duration } = useSprite();
+  const exitStart = Math.max(0, duration - 0.5);
+  const entryT = Easing.easeOutCubic(clamp((localTime - delay) / 0.6, 0, 1));
+  const exitT  = clamp((localTime - exitStart) / 0.4, 0, 1);
+  const opacity = localTime > delay ? clamp((localTime - delay) / 0.3, 0, 1) * (1 - exitT) : 0;
+  const rise = (1 - entryT) * 26;
+  return (
+    <>
+      <div style={{
+        position:'absolute', left:x, top:130, width:226, height:316,
+        background:'rgba(3,16,38,0.84)',
+        border:`1px solid ${color}44`,
+        borderRadius:20,
+        boxShadow:`0 20px 44px ${color}22`,
+        opacity, transform:`translateY(${rise}px)`,
+      }} />
+      <div style={{
+        position:'absolute', left:x+18, top:148,
+        padding:'5px 10px', borderRadius:999,
+        background:`${color}1f`, color, fontSize:11, fontWeight:700,
+        letterSpacing:'0.06em', textTransform:'uppercase',
+        opacity, transform:`translateY(${rise}px)`,
+      }}>{badge}</div>
+      <div style={{
+        position:'absolute', left:x+18, top:188, color:'#f3fbff',
+        fontSize:24, fontWeight:800, opacity, transform:`translateY(${rise}px)`,
+      }}>{role}</div>
+      <div style={{
+        position:'absolute', left:x+18, top:226, width:190,
+        opacity, transform:`translateY(${rise}px)`,
+      }}>
+        {perms.map((p, i) => (
+          <div key={p} style={{
+            display:'flex', alignItems:'center', gap:10,
+            color:'rgba(225,245,255,0.78)',
+            fontSize:13, marginBottom:10,
+          }}>
+            <span style={{
+              width:6, height:6, borderRadius:'50%',
+              background:color, boxShadow:`0 0 8px ${color}99`,
+              flexShrink:0,
+            }}/>
+            {p}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/* ─────────── NEW: Anlık Bildirim Akışı ─────────── */
+function Toast({ y, delay, color, title, body }) {
+  const { localTime, duration } = useSprite();
+  const exitStart = Math.max(0, duration - 0.6);
+  const entryT = Easing.easeOutBack(clamp((localTime - delay) / 0.5, 0, 1));
+  const exitT  = clamp((localTime - exitStart) / 0.45, 0, 1);
+  const opacity = localTime > delay ? clamp((localTime - delay) / 0.3, 0, 1) * (1 - exitT) : 0;
+  const slide = (1 - entryT) * 70;
+  return (
+    <div style={{
+      position:'absolute', left: 520 + slide, top:y, width:360,
+      background:'rgba(3,16,38,0.88)',
+      border:`1px solid ${color}55`,
+      borderRadius:14,
+      padding:'14px 18px',
+      boxShadow:`0 16px 36px ${color}22`,
+      opacity,
+      display:'flex', gap:12, alignItems:'flex-start',
+    }}>
+      <div style={{
+        width:34, height:34, flexShrink:0,
+        borderRadius:'50%',
+        background:`${color}22`,
+        border:`1px solid ${color}66`,
+        display:'flex', alignItems:'center', justifyContent:'center',
+        color, fontSize:16, fontWeight:800,
+      }}>!</div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ color:'#f4fbff', fontSize:14, fontWeight:700, marginBottom:4 }}>{title}</div>
+        <div style={{ color:'rgba(144,224,239,0.68)', fontSize:12 }}>{body}</div>
+      </div>
+      <div style={{
+        color:'rgba(144,224,239,0.4)', fontSize:11,
+        fontFamily:'"JetBrains Mono", ui-monospace, monospace',
+      }}>az önce</div>
+    </div>
+  );
+}
+
+function SocketPulse({ x, y }) {
+  const { localTime } = useSprite();
+  const pulse = (Math.sin(localTime * 3.2) + 1) / 2;
+  return (
+    <>
+      <div style={{
+        position:'absolute', left:x, top:y, width:14, height:14,
+        borderRadius:'50%', background:'#4ade80',
+        boxShadow:`0 0 ${10 + pulse * 18}px rgba(74,222,128,${0.6 + pulse * 0.3})`,
+      }}/>
+      <div style={{
+        position:'absolute', left:x - 4, top:y - 4, width:22, height:22,
+        borderRadius:'50%',
+        border:'1px solid rgba(74,222,128,0.55)',
+        opacity: 1 - pulse,
+        transform:`scale(${1 + pulse * 1.4})`,
+      }}/>
+    </>
+  );
+}
+
+function CodeStream() {
+  const { localTime, duration } = useSprite();
+  const exitStart = Math.max(0, duration - 0.5);
+  const exitT = clamp((localTime - exitStart) / 0.4, 0, 1);
+  const opacity = (1 - exitT) * 0.9;
+  const lines = [
+    "io.emit('belge:onaylandi', { id: 42 })",
+    "→ danışman.notify  ✓",
+    "→ öğrenci.notify   ✓",
+    "→ arşiv.sync       ✓",
+  ];
+  return (
+    <div style={{
+      position:'absolute', left:80, top:140, width:380, height:300,
+      background:'rgba(3,16,38,0.86)',
+      border:`1px solid ${PANEL_BORDER}`,
+      borderRadius:18,
+      padding:'18px 22px',
+      fontFamily:'"JetBrains Mono", ui-monospace, monospace',
+      color:'rgba(144,224,239,0.85)',
+      fontSize:13,
+      lineHeight:1.7,
+      opacity,
+      overflow:'hidden',
+    }}>
+      <div style={{ color:'rgba(144,224,239,0.45)', fontSize:11, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:14 }}>
+        Socket.IO Akışı
+      </div>
+      {lines.map((line, i) => {
+        const showAt = 0.4 + i * 0.55;
+        const lineOpacity = clamp((localTime - showAt) / 0.3, 0, 1);
+        const dy = (1 - lineOpacity) * 8;
+        return (
+          <div key={i} style={{
+            opacity: lineOpacity,
+            transform:`translateY(${dy}px)`,
+            color: i === 0 ? '#90e0ef' : '#4ade80',
+            marginBottom: 6,
+            whiteSpace:'nowrap',
+          }}>
+            {line}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function ClosingPanel() {
   const { localTime } = useSprite();
   const entryT = Easing.easeOutCubic(clamp((localTime - 0.12) / 0.8, 0, 1));
@@ -317,7 +573,7 @@ export default function OfflineAsistanDemo() {
     <Stage
       width={960}
       height={540}
-      duration={14}
+      duration={60}
       background={BG}
       persistKey="offline-asistan-demo"
       loop={false}
@@ -325,7 +581,8 @@ export default function OfflineAsistanDemo() {
     >
       <AnimatedBackground />
 
-      <Sprite start={0} end={4}>
+      {/* 1) Hero — 0 → 7 */}
+      <Sprite start={0} end={7}>
         <GlowOrb x={80} y={120} size={220} color="#00b4d8" delay={0.05} />
         <GlowOrb x={720} y={90} size={180} color="#90e0ef" delay={0.2} />
         <TextSprite
@@ -368,7 +625,8 @@ export default function OfflineAsistanDemo() {
         <LivePill />
       </Sprite>
 
-      <Sprite start={3.2} end={7.2}>
+      {/* 2) Akış ve Yönetim Paneli — 6.5 → 14.5 */}
+      <Sprite start={6.5} end={14.5}>
         <TextSprite
           text="Akış ve Yönetim Paneli"
           x={480}
@@ -378,17 +636,18 @@ export default function OfflineAsistanDemo() {
           align="center"
           weight={800}
           letterSpacing="0.04em"
-          entryDur={0.35}
-          exitDur={0.35}
+          entryDur={0.4}
+          exitDur={0.4}
         />
         <FakeScreen />
         <FlowBeam />
-        <MetricCard x={116} y={388} label="Aktif Süreç" value="12+" accent="#4ade80" delay={0.3} />
-        <MetricCard x={380} y={388} label="Belge Tipi" value="4" accent="#f59e0b" delay={0.45} />
-        <MetricCard x={644} y={388} label="Rol Bazlı" value="Yetkili" accent="#a78bfa" delay={0.6} />
+        <MetricCard x={116} y={388} label="Aktif Süreç" value="12+" accent="#4ade80" delay={0.4} />
+        <MetricCard x={380} y={388} label="Belge Tipi" value="4" accent="#f59e0b" delay={0.65} />
+        <MetricCard x={644} y={388} label="Rol Bazlı" value="Yetkili" accent="#a78bfa" delay={0.9} />
       </Sprite>
 
-      <Sprite start={6.8} end={10.9}>
+      {/* 3) Temel Modüller — 14 → 22 */}
+      <Sprite start={14} end={22}>
         <TextSprite
           text="Temel Modüller"
           x={480}
@@ -398,16 +657,155 @@ export default function OfflineAsistanDemo() {
           align="center"
           weight={800}
           letterSpacing="0.05em"
-          entryDur={0.35}
-          exitDur={0.35}
+          entryDur={0.4}
+          exitDur={0.4}
         />
-        <ModuleCard x={100} title="Erasmus" subtitle="Yurt dışı başvuru ve evrak takibi tek akışta." tag="Uluslararası" delay={0.1} />
-        <ModuleCard x={294} title="Staj" subtitle="Zorunlu ve isteğe bağlı staj evrak yönetimi." tag="Kariyer" delay={0.25} />
-        <ModuleCard x={488} title="Muafiyet" subtitle="Ders eşleştirme ve onay süreci merkezi görünüm." tag="Akademik" delay={0.4} />
-        <ModuleCard x={682} title="Sınav" subtitle="Programlama, yayınlama ve duyuru yönetimi." tag="Planlama" delay={0.55} />
+        <ModuleCard x={100} title="Erasmus" subtitle="Yurt dışı başvuru ve evrak takibi tek akışta." tag="Uluslararası" delay={0.2} />
+        <ModuleCard x={294} title="Staj" subtitle="Zorunlu ve isteğe bağlı staj evrak yönetimi." tag="Kariyer" delay={0.45} />
+        <ModuleCard x={488} title="Muafiyet" subtitle="Ders eşleştirme ve onay süreci merkezi görünüm." tag="Akademik" delay={0.7} />
+        <ModuleCard x={682} title="Sınav" subtitle="Programlama, yayınlama ve duyuru yönetimi." tag="Planlama" delay={0.95} />
       </Sprite>
 
-      <Sprite start={10.3} end={13}>
+      {/* 4) NEW: Belge Akış Süreci — 21.5 → 31 */}
+      <Sprite start={21.5} end={31}>
+        <GlowOrb x={650} y={60} size={260} color="#00b4d8" delay={0.1} />
+        <TextSprite
+          text="Belge Akış Süreci"
+          x={480}
+          y={68}
+          size={26}
+          color={ACCENT}
+          align="center"
+          weight={800}
+          letterSpacing="0.05em"
+          entryDur={0.4}
+          exitDur={0.4}
+        />
+        <TextSprite
+          text="Her başvuru tek bir akışta uçtan uca takip edilir"
+          x={480}
+          y={112}
+          size={13}
+          color="rgba(144,224,239,0.58)"
+          align="center"
+          weight={500}
+          letterSpacing="0.04em"
+          entryDur={0.6}
+          exitDur={0.35}
+        />
+        <FlowNode x={100} title="Öğrenci"  status="Başvuru"  accent="#4ade80" delay={0.3} />
+        <FlowArrow x={278}  delay={0.85} />
+        <FlowNode x={312} title="Danışman" status="Onay"     accent="#f59e0b" delay={1.0} />
+        <FlowArrow x={490}  delay={1.55} />
+        <FlowNode x={524} title="Bölüm"    status="İnceleme" accent="#a78bfa" delay={1.7} />
+        <FlowArrow x={702}  delay={2.25} />
+        <FlowNode x={736} title="Arşiv"    status="Senkron"  accent={ACCENT} delay={2.4} />
+        <FlowPulse delay={3.4} />
+      </Sprite>
+
+      {/* 5) NEW: Rol Bazlı Yetkilendirme — 30.5 → 40 */}
+      <Sprite start={30.5} end={40}>
+        <TextSprite
+          text="Rol Bazlı Yetkilendirme"
+          x={480}
+          y={56}
+          size={26}
+          color={ACCENT}
+          align="center"
+          weight={800}
+          letterSpacing="0.05em"
+          entryDur={0.4}
+          exitDur={0.4}
+        />
+        <TextSprite
+          text="Her kullanıcı kendi sorumluluğundaki ekranı görür"
+          x={480}
+          y={98}
+          size={13}
+          color="rgba(144,224,239,0.58)"
+          align="center"
+          weight={500}
+          letterSpacing="0.04em"
+          entryDur={0.6}
+          exitDur={0.35}
+        />
+        <RoleCard
+          x={80} delay={0.3}
+          role="Öğrenci"
+          badge="Başvuru"
+          color="#4ade80"
+          perms={['Belge başvurusu oluştur', 'Durum takibi', 'Bildirim alma']}
+        />
+        <RoleCard
+          x={326} delay={0.55}
+          role="Danışman"
+          badge="Onay"
+          color="#f59e0b"
+          perms={['Başvuru inceleme', 'Onay / red işlemleri', 'Geri bildirim yazma']}
+        />
+        <RoleCard
+          x={572} delay={0.8}
+          role="Bölüm"
+          badge="Akademik"
+          color="#a78bfa"
+          perms={['Süreç onayı', 'Toplu işlem', 'Raporlama']}
+        />
+        <RoleCard
+          x={818 - 80} delay={1.05}
+          role="Yönetici"
+          badge="Admin"
+          color={ACCENT}
+          perms={['Kullanıcı yönetimi', 'Sistem ayarları', 'Tam erişim']}
+        />
+      </Sprite>
+
+      {/* 6) NEW: Anlık Bildirim Akışı — 39.5 → 48 */}
+      <Sprite start={39.5} end={48}>
+        <TextSprite
+          text="Anlık Bildirim Akışı"
+          x={480}
+          y={56}
+          size={26}
+          color={ACCENT}
+          align="center"
+          weight={800}
+          letterSpacing="0.05em"
+          entryDur={0.4}
+          exitDur={0.4}
+        />
+        <TextSprite
+          text="Socket.IO ile her değişiklik anında ilgili tarafa düşer"
+          x={480}
+          y={98}
+          size={13}
+          color="rgba(144,224,239,0.58)"
+          align="center"
+          weight={500}
+          letterSpacing="0.04em"
+          entryDur={0.6}
+          exitDur={0.35}
+        />
+        <CodeStream />
+        <SocketPulse x={420} y={154} />
+        <TextSprite
+          text="connected"
+          x={440}
+          y={148}
+          size={11}
+          color="#4ade80"
+          weight={700}
+          letterSpacing="0.1em"
+          entryDur={0.5}
+          exitDur={0.3}
+        />
+        <Toast y={150} delay={0.5} color="#4ade80"  title="Yeni Başvuru"     body="Ahmet K. — Staj belgesi gönderildi" />
+        <Toast y={230} delay={1.4} color="#f59e0b"  title="Onay Bekliyor"    body="Danışman onayı gerekiyor"           />
+        <Toast y={310} delay={2.3} color="#a78bfa"  title="Bölüm Onayı"      body="Belge bölüm tarafından incelendi"   />
+        <Toast y={390} delay={3.2} color={ACCENT}   title="Arşivlendi"       body="Süreç tamamlandı, arşive aktarıldı"  />
+      </Sprite>
+
+      {/* 7) Teknoloji Yığını — 47.5 → 55 */}
+      <Sprite start={47.5} end={55}>
         <TextSprite
           text="Teknoloji Yığını"
           x={480}
@@ -417,8 +815,8 @@ export default function OfflineAsistanDemo() {
           align="center"
           weight={800}
           letterSpacing="0.05em"
-          entryDur={0.35}
-          exitDur={0.35}
+          entryDur={0.4}
+          exitDur={0.4}
         />
         <ImageSprite
           x={94}
@@ -439,15 +837,16 @@ export default function OfflineAsistanDemo() {
             </div>
           </div>
         </Panel>
-        <TechChip x={448} y={376} label="React" color="#61dafb" delay={0.15} />
-        <TechChip x={590} y={376} label="Vite" color="#a78bfa" delay={0.25} />
-        <TechChip x={732} y={376} label="Tailwind" color="#38bdf8" delay={0.35} />
-        <TechChip x={448} y={430} label="Node.js" color="#86efac" delay={0.45} />
-        <TechChip x={590} y={430} label="Express" color="#d1d5db" delay={0.55} />
-        <TechChip x={732} y={430} label="MongoDB" color="#4ade80" delay={0.65} />
+        <TechChip x={448} y={376} label="React"    color="#61dafb" delay={0.25} />
+        <TechChip x={590} y={376} label="Vite"     color="#a78bfa" delay={0.4}  />
+        <TechChip x={732} y={376} label="Tailwind" color="#38bdf8" delay={0.55} />
+        <TechChip x={448} y={430} label="Node.js"  color="#86efac" delay={0.7}  />
+        <TechChip x={590} y={430} label="Express"  color="#d1d5db" delay={0.85} />
+        <TechChip x={732} y={430} label="MongoDB"  color="#4ade80" delay={1.0}  />
       </Sprite>
 
-      <Sprite start={12.3} end={14}>
+      {/* 8) Closing — 54.5 → 60 */}
+      <Sprite start={54.5} end={60}>
         <GlowOrb x={300} y={220} size={360} color="#00b4d8" delay={0} />
         <TextSprite
           text="Offline Asistan"
@@ -459,7 +858,7 @@ export default function OfflineAsistanDemo() {
           weight={800}
           letterSpacing="-0.03em"
           entryDur={0.45}
-          exitDur={0.28}
+          exitDur={0.4}
         />
         <ClosingPanel />
       </Sprite>
