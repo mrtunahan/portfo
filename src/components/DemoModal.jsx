@@ -1,14 +1,27 @@
+import { useEffect } from 'react';
 import OfflineAsistanDemo from '../animations/OfflineAsistanDemo';
+import KaratekinTravelDemo from '../animations/KaratekinTravelDemo';
 
-export default function DemoModal({ onClose }) {
+const DEMO_KEYS = {
+  0: 'offline-asistan-demo:t',
+  2: 'karatekin-travel-demo:t',
+};
+
+export default function DemoModal({ onClose, projectId = 0 }) {
+  useEffect(() => {
+    try {
+      const key = DEMO_KEYS[projectId];
+      if (key) localStorage.removeItem(key);
+    } catch {}
+  }, [projectId]);
+
   return (
     <div style={{
       position:'fixed', inset:0, zIndex:9000,
       background:'rgba(0,0,0,0.88)',
       backdropFilter:'blur(6px)',
     }}>
-      {/* Stage fills the overlay */}
-      <OfflineAsistanDemo />
+      {projectId === 2 ? <KaratekinTravelDemo /> : <OfflineAsistanDemo />}
 
       {/* Kapat butonu */}
       <button

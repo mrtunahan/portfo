@@ -393,8 +393,8 @@ export default function ProjectionScreen({ isLightOn, selectedProject, onClose, 
               </button>
             )}
 
-            {/* Demo Oynat butonu (sadece Offline Asistan için) */}
-            {selectedProject.id === 0 && (
+            {/* Demo Oynat butonu (Offline Asistan ve KarateKin Travel için) */}
+            {(selectedProject.id === 0 || selectedProject.id === 2) && (
               <button
                 onClick={onDemoPlay}
                 title="Demo Oynat"

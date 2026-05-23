@@ -1,4 +1,135 @@
 import { useMemo } from 'react';
+import * as THREE from 'three';
+
+function makeKaratekinCupTex() {
+  const W = 512, H = 256;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+
+  // ─ Arka plan: gök mavisi
+  ctx.fillStyle = '#4ab5d0';
+  ctx.fillRect(0, 0, W, H);
+
+  // ─ Logo merkezi (canvas ortası)
+  const cx = W / 2, cy = H / 2;
+  const R = H * 0.42;
+
+  // Dış çember
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 7;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // İç dolgu (biraz daha koyu mavi)
+  ctx.fillStyle = '#3a9ec8';
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Küre çizgileri
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+  ctx.lineWidth = 1.5;
+  // Ekvator
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - 4, R * 0.56, R * 0.14, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  // Boylamlar
+  for (let a = -1; a <= 1; a++) {
+    ctx.beginPath();
+    ctx.ellipse(cx + a * R * 0.28, cy - 4, R * 0.18, R * 0.52, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // Küre dış däire
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy - 4, R * 0.52, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Sarı şerit (banner)
+  const bannerY = cy + 10;
+  ctx.fillStyle = '#f5c842';
+  const bw = R * 1.52, bh = 26;
+  ctx.beginPath();
+  ctx.moveTo(cx - bw / 2 + 10, bannerY - bh / 2);
+  ctx.lineTo(cx + bw / 2 - 10, bannerY - bh / 2);
+  ctx.lineTo(cx + bw / 2, bannerY);
+  ctx.lineTo(cx + bw / 2 - 10, bannerY + bh / 2);
+  ctx.lineTo(cx - bw / 2 + 10, bannerY + bh / 2);
+  ctx.lineTo(cx - bw / 2, bannerY);
+  ctx.closePath();
+  ctx.fill();
+
+  // KARATEKIN TRAVEL
+  ctx.fillStyle = '#1a1a0a';
+  ctx.font = 'bold 17px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('KARATEKIN TRAVEL', cx, bannerY + 6);
+
+  // Üst yazı (çevre)
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 11px Arial';
+  const arcText = 'CANKIRI KARATEKIN UNIVERSITESI';
+  const arcR = R - 14;
+  const totalAngle = Math.PI * 1.1;
+  const startA = -Math.PI / 2 - totalAngle / 2;
+  for (let i = 0; i < arcText.length; i++) {
+    const angle = startA + (i / (arcText.length - 1)) * totalAngle;
+    ctx.save();
+    ctx.translate(cx + Math.cos(angle) * arcR, cy + Math.sin(angle) * arcR);
+    ctx.rotate(angle + Math.PI / 2);
+    ctx.fillText(arcText[i], 0, 0);
+    ctx.restore();
+  }
+
+  // Alt — 2024
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 13px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('2024', cx, cy + R * 0.82);
+
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = THREE.RepeatWrapping;
+  t.wrapT = THREE.ClampToEdgeWrapping;
+  return t;
+}
+
+/* KarateKin Travel logolu bardak */
+function CupWithLogo({ position }) {
+  const tex = useMemo(() => makeKaratekinCupTex(), []);
+  return (
+    <group position={position}>
+      {/* Bardak gövdesi */}
+      <mesh castShadow>
+        <cylinderGeometry args={[0.038, 0.032, 0.09, 32]} />
+        <meshStandardMaterial
+          map={tex}
+          roughness={0.3}
+          metalness={0.05}
+          toneMapped={false}
+        />
+      </mesh>
+      {/* Bardak iç (koyu) */}
+      <mesh position={[0, 0.042, 0]}>
+        <cylinderGeometry args={[0.035, 0.035, 0.004, 16]} />
+        <meshStandardMaterial color="#2a1a0e" roughness={0.8} />
+      </mesh>
+      {/* Kahve yüzeyi */}
+      <mesh position={[0, 0.040, 0]}>
+        <circleGeometry args={[0.033, 16]} />
+        <meshStandardMaterial color="#3d1e08" roughness={0.6} />
+      </mesh>
+      {/* Kulp */}
+      <mesh position={[0.048, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <torusGeometry args={[0.018, 0.005, 6, 12, Math.PI]} />
+        <meshStandardMaterial color="#4ab5d0" roughness={0.3} metalness={0.05} />
+      </mesh>
+    </group>
+  );
+}
 
 /* Koltuk önündeki cam sehpa */
 export function CoffeeTable({ position = [0, 0, 0], ...props }) {
@@ -76,11 +207,8 @@ export function CoffeeTable({ position = [0, 0, 0], ...props }) {
         <meshStandardMaterial color="#3d1a1a" roughness={0.9} />
       </mesh>
 
-      {/* ── Bardak ── */}
-      <mesh position={[0.42, TY + 0.009, -0.12]} castShadow>
-        <cylinderGeometry args={[0.038, 0.032, 0.09, 14]} />
-        <meshStandardMaterial color="#f5f0e8" roughness={0.25} metalness={0.05} />
-      </mesh>
+      {/* ── Bardak (KarateKin Travel logolu) ── */}
+      <CupWithLogo position={[0.42, TY + 0.009, -0.12]} />
     </group>
   );
 }
