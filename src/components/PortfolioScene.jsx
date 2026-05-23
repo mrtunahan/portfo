@@ -377,7 +377,12 @@ export default function PortfolioScene() {
       <ContentOverlay isLightOn={isLightOn} />
 
       {/* Demo Modal */}
-      {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
+      {showDemo && (
+        <DemoModal
+          projectId={selectedProject?.id}
+          onClose={() => setShowDemo(false)}
+        />
+      )}
 
       {/* Vignette efekti */}
       <div

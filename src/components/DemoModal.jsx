@@ -1,16 +1,21 @@
 import OfflineAsistanDemo from '../animations/OfflineAsistanDemo';
+import KaratekinTravelDemo from '../animations/KaratekinTravelDemo';
 
-export default function DemoModal({ onClose }) {
+const DEMOS = {
+  0: OfflineAsistanDemo,
+  2: KaratekinTravelDemo,
+};
+
+export default function DemoModal({ onClose, projectId = 0 }) {
+  const Demo = DEMOS[projectId] || OfflineAsistanDemo;
   return (
     <div style={{
       position:'fixed', inset:0, zIndex:9000,
       background:'rgba(0,0,0,0.88)',
       backdropFilter:'blur(6px)',
     }}>
-      {/* Stage fills the overlay */}
-      <OfflineAsistanDemo />
+      <Demo />
 
-      {/* Kapat butonu */}
       <button
         onClick={onClose}
         title="Kapat"
