@@ -393,7 +393,7 @@ export default function ProjectionScreen({ isLightOn, selectedProject, onClose, 
               </button>
             )}
 
-            {/* Demo Oynat butonu (Offline Asistan ve KarateKin Travel için) */}
+            {/* Demo Oynat butonu — demosu olan projeler için */}
             {(selectedProject.id === 0 || selectedProject.id === 2) && (
               <button
                 onClick={onDemoPlay}
@@ -401,14 +401,14 @@ export default function ProjectionScreen({ isLightOn, selectedProject, onClose, 
                 style={{
                   padding: '5px 10px',
                   borderRadius: '12px',
-                  background: 'rgba(0,180,216,0.88)',
+                  background: `${selectedProject.color}dd`,
                   color: '#fff',
-                  border: '1px solid rgba(0,180,216,0.5)',
+                  border: `1px solid ${selectedProject.color}88`,
                   cursor: 'pointer',
                   fontSize: '11px',
                   fontWeight: 'bold',
                   whiteSpace: 'nowrap',
-                  boxShadow: '0 0 10px rgba(0,180,216,0.55)',
+                  boxShadow: `0 0 10px ${selectedProject.color}88`,
                   userSelect: 'none',
                 }}
               >

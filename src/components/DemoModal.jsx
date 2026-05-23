@@ -2,12 +2,19 @@ import { useEffect } from 'react';
 import OfflineAsistanDemo from '../animations/OfflineAsistanDemo';
 import KaratekinTravelDemo from '../animations/KaratekinTravelDemo';
 
+const DEMOS = {
+  0: OfflineAsistanDemo,
+  2: KaratekinTravelDemo,
+};
+
 const DEMO_KEYS = {
   0: 'offline-asistan-demo:t',
   2: 'karatekin-travel-demo:t',
 };
 
 export default function DemoModal({ onClose, projectId = 0 }) {
+  const Demo = DEMOS[projectId] || OfflineAsistanDemo;
+
   useEffect(() => {
     try {
       const key = DEMO_KEYS[projectId];
@@ -21,9 +28,8 @@ export default function DemoModal({ onClose, projectId = 0 }) {
       background:'rgba(0,0,0,0.88)',
       backdropFilter:'blur(6px)',
     }}>
-      {projectId === 2 ? <KaratekinTravelDemo /> : <OfflineAsistanDemo />}
+      <Demo />
 
-      {/* Kapat butonu */}
       <button
         onClick={onClose}
         title="Kapat"
