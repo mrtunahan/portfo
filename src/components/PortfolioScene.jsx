@@ -18,6 +18,7 @@ import EaselPainting from './EaselPainting';
 import SocialBoard from './SocialBoard';
 import ProjectionScreen from './ProjectionScreen';
 import ProjectShelves from './ProjectShelves';
+import ScientificShelves from './ScientificShelves';
 import Rug from './Rug';
 import DemoModal from './DemoModal';
 
@@ -170,6 +171,69 @@ function ProjelerPlaque() {
   );
 }
 
+/* ─── Bilimsel projeler duvar plakası ─── */
+function BilimselPlaque() {
+  const tex = useMemo(() => {
+    const W = 512, H = 160;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d');
+
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#1a1005');
+    bg.addColorStop(1, '#110c04');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = 'rgba(245,158,11,0.45)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(24, 18); ctx.lineTo(W - 24, 18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(24, H - 18); ctx.lineTo(W - 24, H - 18); ctx.stroke();
+
+    ctx.fillStyle = '#f5c67a';
+    ctx.font = 'bold 44px Arial';
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '2px';
+    ctx.fillText('BİLİMSEL PROJELER', W / 2, H / 2 + 16);
+
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }, []);
+
+  return (
+    <group position={[2.4, 3.25, -4.92]} rotation={[0, 0, 0]}>
+      <mesh>
+        <boxGeometry args={[1.4, 0.44, 0.03]} />
+        <meshStandardMaterial color="#2a1a08" roughness={0.72} metalness={0.05} />
+      </mesh>
+      <mesh position={[0, 0, 0.017]}>
+        <planeGeometry args={[1.34, 0.38]} />
+        <meshStandardMaterial
+          map={tex}
+          emissiveMap={tex}
+          emissive="#ffffff"
+          emissiveIntensity={0.18}
+          roughness={0.85}
+          toneMapped={false}
+        />
+      </mesh>
+      {[
+        [0,  0.22,  0.022, 1.4,  0.018, 0.018],
+        [0, -0.22,  0.022, 1.4,  0.018, 0.018],
+        [ 0.7, 0,   0.022, 0.018, 0.44, 0.018],
+        [-0.7, 0,   0.022, 0.018, 0.44, 0.018],
+      ].map(([x, y, z, w, h, d], i) => (
+        <mesh key={i} position={[x, y, z]}>
+          <boxGeometry args={[w, h, d]} />
+          <meshStandardMaterial color="#c9922a" roughness={0.3} metalness={0.6} />
+        </mesh>
+      ))}
+      <pointLight position={[0, 0, 0.4]} color="#f5c67a" intensity={0.25} distance={2.5} decay={2} />
+    </group>
+  );
+}
+
 const _DEF_CAM_POS     = new THREE.Vector3(0, 2.2, 4.5);
 const _DEF_CAM_TARGET  = new THREE.Vector3(0, 1.2, -1);
 
@@ -296,8 +360,8 @@ export default function PortfolioScene() {
           {/* Sehpa — koltuğun önünde */}
           <CoffeeTable position={[0, 0, 0.3]} />
 
-          {/* Kahve dumanı — bardağın üstünde */}
-          <CoffeeSteam position={[0.25, 0.48, 0.22]} isLightOn={isLightOn} />
+          {/* Kahve dumanı — bardağın tam üstünde */}
+          <CoffeeSteam position={[0.42, 0.474, 0.18]} isLightOn={isLightOn} />
 
           {/* Kitaplık — Akademik plakasının altı, sağ duvar */}
           <Bookshelf
@@ -314,8 +378,8 @@ export default function PortfolioScene() {
             rotation={[0, Math.atan2(3.5, 3.7), 0]}
           />
 
-          {/* Sosyal Medya Panosu — tavandan sağ arka köşe */}
-          <SocialBoard position={[3.8, 5.88, -4.0]} />
+          {/* Sosyal Medya Panosu — arka duvar tam ortası */}
+          <SocialBoard position={[0, 5.94, -4.85]} />
 
           {/* Halı — sehpa ve koltuk altında */}
           <Rug />
@@ -326,8 +390,14 @@ export default function PortfolioScene() {
           {/* Projeler plak — arka duvar, rafın üstü */}
           <ProjelerPlaque />
 
+          {/* Bilimsel projeler plak — arka duvar sağ */}
+          <BilimselPlaque />
+
           {/* Proje rafları — arka duvar sol */}
           <ProjectShelves onSelect={handleCardSelect} />
+
+          {/* Bilimsel proje rafları — arka duvar sağ (simetrik) */}
+          <ScientificShelves />
 
           {/* Projeksiyon perdesi + projektör — sol taraf */}
           <ProjectionScreen
@@ -379,7 +449,7 @@ export default function PortfolioScene() {
       {/* Demo Modal */}
       {showDemo && (
         <DemoModal
-          projectId={selectedProject?.id}
+          projectId={selectedProject?.id ?? 0}
           onClose={() => setShowDemo(false)}
         />
       )}

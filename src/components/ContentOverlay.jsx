@@ -42,10 +42,10 @@ export default function ContentOverlay({ isLightOn }) {
       {/* ─── İsim & Başlık — Sol Üst ─── */}
       <div className={`absolute top-8 left-8 pointer-events-auto opacity-0 ${isLightOn ? 'animate-fade-up stagger-1' : ''}`}>
         <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight text-shadow-glow">
-          Tunahan
+          A. Tunahan Korkmaz
         </h1>
         <p className="mt-2 text-amber-400/80 text-sm md:text-base font-medium tracking-widest uppercase">
-          Full-Stack Developer
+          Half Academıcıan Half Coder
         </p>
         <div className="mt-3 h-[2px] w-16 bg-gradient-to-r from-amber-500/80 to-transparent" />
       </div>

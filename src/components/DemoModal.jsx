@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import OfflineAsistanDemo from '../animations/OfflineAsistanDemo';
 import KaratekinTravelDemo from '../animations/KaratekinTravelDemo';
 
@@ -6,8 +7,21 @@ const DEMOS = {
   2: KaratekinTravelDemo,
 };
 
+const DEMO_KEYS = {
+  0: 'offline-asistan-demo:t',
+  2: 'karatekin-travel-demo:t',
+};
+
 export default function DemoModal({ onClose, projectId = 0 }) {
   const Demo = DEMOS[projectId] || OfflineAsistanDemo;
+
+  useEffect(() => {
+    try {
+      const key = DEMO_KEYS[projectId];
+      if (key) localStorage.removeItem(key);
+    } catch {}
+  }, [projectId]);
+
   return (
     <div style={{
       position:'fixed', inset:0, zIndex:9000,
