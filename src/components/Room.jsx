@@ -61,6 +61,120 @@ function makeWoodFloorTex() {
   return tex;
 }
 
+function makeBrickWallTex() {
+  const W = 512, H = 512;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#1c1008';
+  ctx.fillRect(0, 0, W, H);
+  const bH = 30, bW = 60, mH = 5, mV = 4;
+  const colors = ['#8b3a1a', '#9c4220', '#7e3416', '#a84a22', '#863c1c', '#904018'];
+  const rows = Math.ceil(H / (bH + mH)) + 1;
+  const cols = Math.ceil(W / (bW + mV)) + 2;
+  for (let row = 0; row < rows; row++) {
+    const y = row * (bH + mH);
+    const offset = (row % 2) * ((bW + mV) / 2);
+    for (let col = 0; col < cols; col++) {
+      const x = col * (bW + mV) - offset;
+      ctx.fillStyle = colors[(row * 5 + col * 3) % colors.length];
+      ctx.fillRect(x + mV, y + mH, bW - mV, bH - mH);
+      const g = ctx.createLinearGradient(x, y + mH, x, y + bH);
+      g.addColorStop(0, 'rgba(255,180,80,0.10)');
+      g.addColorStop(0.4, 'rgba(0,0,0,0)');
+      g.addColorStop(1, 'rgba(0,0,0,0.22)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x + mV, y + mH, bW - mV, bH - mH);
+      const s = row * 17 + col * 31;
+      for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = 'rgba(0,0,0,0.08)';
+        ctx.fillRect(
+          x + mV + (s * (i + 7) * 13) % (bW - mV),
+          y + mH + (s * (i + 3) * 7) % (bH - mH),
+          5, 1
+        );
+      }
+    }
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(4, 2.5);
+  return tex;
+}
+
+function rrPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function makeStoneWallTex() {
+  const W = 512, H = 512;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#13100a';
+  ctx.fillRect(0, 0, W, H);
+  const sColors = ['#5a4e3a', '#6a5840', '#4e4232', '#625648', '#58503c', '#4a3e2c'];
+  const bColors = ['#7a3618', '#8a4020', '#6e3016', '#843a1a'];
+  const mort = 5;
+  let y = 0, ri = 0;
+  while (y < H) {
+    const isBrick = ri % 3 === 2;
+    if (isBrick) {
+      const bH = 18;
+      let x = (ri % 2) * 22;
+      while (x < W) {
+        const bW = 42 + (ri * 7 + Math.floor(x / 42) * 11) % 20;
+        ctx.fillStyle = bColors[(ri + Math.floor(x / 42) * 3) % bColors.length];
+        ctx.fillRect(x + mort, y + mort, bW - mort, bH - mort);
+        const g = ctx.createLinearGradient(x, y, x, y + bH);
+        g.addColorStop(0, 'rgba(255,140,40,0.08)');
+        g.addColorStop(1, 'rgba(0,0,0,0.18)');
+        ctx.fillStyle = g;
+        ctx.fillRect(x + mort, y + mort, bW - mort, bH - mort);
+        x += bW;
+      }
+      y += bH;
+    } else {
+      const sH = 52;
+      let x = (ri % 2) * -25, ci = 0;
+      while (x < W) {
+        const s = ri * 23 + ci * 17;
+        const sW = 44 + (s * 13) % 42;
+        ctx.fillStyle = sColors[s % sColors.length];
+        rrPath(ctx, x + mort, y + mort, sW - mort * 2, sH - mort * 2, 4);
+        ctx.fill();
+        const g = ctx.createLinearGradient(x, y, x, y + sH);
+        g.addColorStop(0, 'rgba(255,220,140,0.07)');
+        g.addColorStop(1, 'rgba(0,0,0,0.20)');
+        ctx.fillStyle = g;
+        rrPath(ctx, x + mort, y + mort, sW - mort * 2, sH - mort * 2, 4);
+        ctx.fill();
+        x += sW; ci++;
+      }
+      y += sH;
+    }
+    ri++;
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(3, 2);
+  return tex;
+}
+
 export default function Room({ isLightOn }) {
   const wallMaterialRef = useRef();
   
@@ -69,9 +183,11 @@ export default function Room({ isLightOn }) {
   const height = 6;
   const depth = 10;
 
-  const wallColor    = useMemo(() => new THREE.Color('#040810'), []);
-  const wallColorLit  = useMemo(() => new THREE.Color('#0c2018'), []);
+  const wallColor    = useMemo(() => new THREE.Color('#050302'), []);
+  const wallColorLit  = useMemo(() => new THREE.Color('#7a4820'), []);
   const woodTex       = useMemo(() => makeWoodFloorTex(), []);
+  const brickTex      = useMemo(() => makeBrickWallTex(), []);
+  const stoneTex      = useMemo(() => makeStoneWallTex(), []);
   const floorColor    = useMemo(() => new THREE.Color('#0a0807'), []);
   const floorColorLit = useMemo(() => new THREE.Color('#ffffff'), []);
 
@@ -124,17 +240,17 @@ export default function Room({ isLightOn }) {
         <meshStandardMaterial color="#0a0a12" roughness={0.9} />
       </mesh>
 
-      {/* Arka duvar */}
+      {/* Arka duvar — tuğla */}
       <mesh
         ref={backWallRef}
         position={[0, height / 2, -depth / 2]}
         receiveShadow
       >
         <planeGeometry args={[width, height]} />
-        <meshStandardMaterial color="#0a0a12" roughness={0.85} />
+        <meshStandardMaterial map={brickTex} color="#080604" roughness={0.94} />
       </mesh>
 
-      {/* Sol duvar */}
+      {/* Sol duvar — taş+tuğla */}
       <mesh
         ref={leftWallRef}
         rotation={[0, Math.PI / 2, 0]}
@@ -142,10 +258,10 @@ export default function Room({ isLightOn }) {
         receiveShadow
       >
         <planeGeometry args={[depth, height]} />
-        <meshStandardMaterial color="#0a0a12" roughness={0.85} />
+        <meshStandardMaterial map={stoneTex} color="#080604" roughness={0.95} />
       </mesh>
 
-      {/* Sağ duvar */}
+      {/* Sağ duvar — taş+tuğla */}
       <mesh
         ref={rightWallRef}
         rotation={[0, -Math.PI / 2, 0]}
@@ -153,7 +269,7 @@ export default function Room({ isLightOn }) {
         receiveShadow
       >
         <planeGeometry args={[depth, height]} />
-        <meshStandardMaterial color="#0a0a12" roughness={0.85} />
+        <meshStandardMaterial map={stoneTex} color="#080604" roughness={0.95} />
       </mesh>
 
       {/* Zemin süpürgelik / baseboard */}

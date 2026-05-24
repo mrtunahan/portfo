@@ -31,11 +31,15 @@ function makeProjectDetailTex(project) {
   ctx.textAlign = 'center';
   ctx.fillText(project.name, W / 2, 68);
 
-  // URL veya geliştirme durumu
+  // URL veya alt bilgi
   if (project.displayUrl) {
     ctx.fillStyle = project.color;
     ctx.font = '16px monospace';
     ctx.fillText('🌐  ' + project.url, W / 2, 105);
+  } else if (project.subTitle) {
+    ctx.fillStyle = project.color + 'dd';
+    ctx.font = 'bold 15px Arial';
+    ctx.fillText(project.subTitle, W / 2, 105);
   } else {
     ctx.fillStyle = '#fbbf24';
     ctx.font = 'bold 16px Arial';
@@ -64,8 +68,9 @@ function makeProjectDetailTex(project) {
   ctx.fillText(project.tech, W / 2, 294);
 
   // Durum rozeti
-  const statusColor = project.status === 'live' ? '#4ade80' : '#fbbf24';
-  const statusText  = project.status === 'live' ? '● LIVE' : '⚙ IN DEVELOPMENT';
+  const isActive = project.status === 'live' || project.status === 'active';
+  const statusColor = isActive ? '#4ade80' : '#fbbf24';
+  const statusText  = isActive ? '● AKTİF' : project.status === 'done' ? '✓ TAMAMLANDI' : '⚙ GELİŞTİRMEDE';
   ctx.fillStyle = statusColor;
   ctx.font = 'bold 14px Arial';
   ctx.fillText(statusText, W / 2, 344);
@@ -79,7 +84,7 @@ function makeProjectDetailTex(project) {
   // Sıra numarası
   ctx.fillStyle = project.color + '88';
   ctx.font = '12px monospace';
-  ctx.fillText(`PROJECT 0${project.id + 1} / 03`, W / 2, 380);
+  ctx.fillText(project.displayLabel || `PROJECT 0${project.id + 1} / 03`, W / 2, 380);
 
   return new THREE.CanvasTexture(c);
 }

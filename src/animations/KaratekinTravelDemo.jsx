@@ -321,7 +321,7 @@ function LoginScreen() {
           padding: '0 12px', display: 'flex', alignItems: 'center',
           fontSize: 11, color: TEXT, border: `1px solid ${PRIMARY}${Math.round(focusPulse * 255).toString(16).padStart(2,'0')}`,
         }}>
-          tuncahan@karatekin.com
+          tunahankorkmaz6@gmail.com
         </div>
       </div>
 
@@ -430,7 +430,7 @@ function HomeScreen() {
                 <div style={{ height: 78, background: t.img }} />
                 <div style={{ padding: '8px 10px' }}>
                   <div style={{ fontSize: 11, fontWeight: 800, color: TEXT }}>{t.name}</div>
-                  <div style={{ fontSize: 9, color: TEXT_SOFT, marginTop: 2 }}>📍 {t.city}</div>
+                  <div style={{ fontSize: 9, color: TEXT_SOFT, marginTop: 2 }}>{t.city}</div>
                   <div style={{ fontSize: 11, fontWeight: 800, color: ACCENT_DEEP, marginTop: 4 }}>{t.price}</div>
                 </div>
               </div>
@@ -456,7 +456,7 @@ function HomeScreen() {
                 <div style={{ width: 48, height: 48, borderRadius: 8, background: t.img }} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, fontWeight: 800, color: TEXT }}>{t.name}</div>
-                  <div style={{ fontSize: 9, color: TEXT_SOFT, marginTop: 1 }}>📍 {t.city}</div>
+                  <div style={{ fontSize: 9, color: TEXT_SOFT, marginTop: 1 }}>{t.city}</div>
                   <div style={{ fontSize: 9, color: ACCENT_DEEP, fontWeight: 700, marginTop: 2 }}>{t.price}</div>
                 </div>
               </div>
@@ -473,8 +473,8 @@ function HomeScreen() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-around',
         fontSize: 16,
       }}>
-        <span style={{ color: PRIMARY }}>⌂</span>
-        <span style={{ color: TEXT_SOFT }}>⌕</span>
+        <span style={{ fontSize: 9, color: PRIMARY, fontWeight: 700 }}>Ana Sayfa</span>
+        <span style={{ fontSize: 9, color: TEXT_SOFT, fontWeight: 700 }}>Ara</span>
         <span style={{
           width: 32, height: 32, borderRadius: '50%',
           background: ACCENT, color: '#fff',
@@ -482,8 +482,8 @@ function HomeScreen() {
           marginTop: -16, fontSize: 16,
           boxShadow: '0 4px 12px rgba(244,162,97,0.5)',
         }}>+</span>
-        <span style={{ color: TEXT_SOFT }}>♡</span>
-        <span style={{ color: TEXT_SOFT }}>👤</span>
+        <span style={{ fontSize: 9, color: TEXT_SOFT, fontWeight: 700 }}>Favoriler</span>
+        <span style={{ fontSize: 9, color: TEXT_SOFT, fontWeight: 700 }}>Profil</span>
       </div>
     </div>
   );
@@ -520,7 +520,7 @@ function TourDetailScreen() {
 
       <div style={{ padding: '12px 16px' }}>
         <div style={{ color: TEXT, fontSize: 16, fontWeight: 800 }}>Amasra Turu</div>
-        <div style={{ color: TEXT_SOFT, fontSize: 10, marginTop: 2 }}>📍 Bartın · 2 Gün 1 Gece</div>
+        <div style={{ color: TEXT_SOFT, fontSize: 10, marginTop: 2 }}>Bartın · 2 Gün 1 Gece</div>
         <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
           {[1, 2, 3, 4, 5].map((i) => (
             <span key={i} style={{ color: i <= 4 ? '#f5b400' : '#ddd', fontSize: 11 }}>★</span>
@@ -530,10 +530,10 @@ function TourDetailScreen() {
 
         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
           {[
-            { ico: '🚌', label: 'Otobüs' },
-            { ico: '🏨', label: 'Otel' },
-            { ico: '🍽', label: 'Yemek' },
-            { ico: '📷', label: 'Rehber' },
+            { label: 'Otobüs' },
+            { label: 'Otel' },
+            { label: 'Yemek' },
+            { label: 'Rehber' },
           ].map((it) => (
             <div key={it.label} style={{
               flex: 1, padding: '8px 0', borderRadius: 8,
@@ -660,7 +660,7 @@ function PaymentScreen() {
         <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontSize: 8, opacity: 0.6 }}>KART SAHİBİ</div>
-            <div style={{ fontSize: 10, fontWeight: 700 }}>TUNCAHAN KORKMAZ</div>
+            <div style={{ fontSize: 10, fontWeight: 700 }}>TUNAHAN KORKMAZ</div>
           </div>
           <div>
             <div style={{ fontSize: 8, opacity: 0.6 }}>S.TAR</div>
@@ -832,7 +832,7 @@ function ProfileScreen() {
           background: 'linear-gradient(135deg, #b8e8ff, #0093d9)',
         }}/>
       </div>
-      <div style={{ marginTop: 84, textAlign: 'center', color: TEXT, fontSize: 14, fontWeight: 800 }}>Tuncahan</div>
+      <div style={{ marginTop: 84, textAlign: 'center', color: TEXT, fontSize: 14, fontWeight: 800 }}>Tunahan</div>
       <div style={{ textAlign: 'center', color: TEXT_SOFT, fontSize: 10 }}>Premium Üye · 5 Tur</div>
 
       <div style={{ display: 'flex', gap: 6, padding: '14px 14px 0', justifyContent: 'space-around' }}>
@@ -846,11 +846,11 @@ function ProfileScreen() {
 
       <div style={{ padding: '14px 14px 0' }}>
         {[
-          ['👤', 'Profil Bilgileri'],
-          ['💳', 'Ödeme Yöntemleri'],
-          ['♡', 'Favori Turlar'],
-          ['🔔', 'Bildirimler'],
-          ['⚙', 'Ayarlar'],
+          ['Profil Bilgileri'],
+          ['Ödeme Yöntemleri'],
+          ['Favori Turlar'],
+          ['Bildirimler'],
+          ['Ayarlar'],
         ].map(([ico, label]) => (
           <div key={label} style={{
             display: 'flex', alignItems: 'center', gap: 10,
@@ -887,13 +887,6 @@ function FeatureCard({ x, y, title, body, icon, accent = ACCENT, delay = 0 }) {
       opacity, transform: `translateY(${rise}px)`,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-        <div style={{
-          width: 28, height: 28, borderRadius: 8,
-          background: `${accent}22`,
-          border: `1px solid ${accent}55`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: accent, fontSize: 14, fontWeight: 800,
-        }}>{icon}</div>
         <div style={{ color: '#fff7ee', fontSize: 13, fontWeight: 800 }}>{title}</div>
       </div>
       <div style={{ color: 'rgba(255,236,210,0.66)', fontSize: 11, lineHeight: 1.5 }}>{body}</div>
@@ -1075,7 +1068,7 @@ export default function KaratekinTravelDemo() {
         </PhoneFrame>
         <FeatureCard
           x={26} y={234} delay={0.95}
-          icon="🔐" accent={ACCENT}
+          accent={ACCENT}
           title="E-posta + Sosyal Giriş"
           body="Facebook, Twitter ve Google ile tek dokunuşta giriş; e-posta doğrulama akışı."
         />
@@ -1094,19 +1087,19 @@ export default function KaratekinTravelDemo() {
         </PhoneFrame>
         <FeatureCard
           x={40} y={130} delay={0.7}
-          icon="🌍" accent={ACCENT}
+          accent={ACCENT}
           title="Kişiselleştirilmiş Öneriler"
           body="Konum, geçmiş rezervasyon ve favorilerine göre öne çıkan turlar."
         />
         <FeatureCard
           x={690} y={130} delay={0.9}
-          icon="⌕" accent={PRIMARY}
+          accent={PRIMARY}
           title="Hızlı Arama"
           body="Şehir, tarih ve bütçeye göre anlık filtreleme; yatay kaydırılabilir kategoriler."
         />
         <FeatureCard
           x={690} y={290} delay={1.1}
-          icon="₺" accent={SUCCESS}
+          accent={SUCCESS}
           title="Şeffaf Fiyatlar"
           body="Kişi başı fiyat ve doluluk oranı kartın üzerinde; gizli ücret yok."
         />
@@ -1125,19 +1118,19 @@ export default function KaratekinTravelDemo() {
         </PhoneFrame>
         <FeatureCard
           x={40} y={130} delay={0.7}
-          icon="📸" accent={ACCENT}
+          accent={ACCENT}
           title="Zengin Tur Sayfası"
           body="Galeri, açıklama, içerikler (otobüs, otel, yemek, rehber) ve gerçek yorumlar."
         />
         <FeatureCard
           x={40} y={300} delay={0.95}
-          icon="★" accent="#f5b400"
+          accent="#f5b400"
           title="Yorum ve Puanlama"
           body="Doğrulanmış yolcu yorumları; ortalama puan ve detaylı kırılım."
         />
         <FeatureCard
           x={690} y={200} delay={1.15}
-          icon="%" accent={SUCCESS}
+          accent={SUCCESS}
           title="Anlık Doluluk"
           body="Kalan koltuk sayısı ve doluluk oranı canlı güncellenir."
         />
@@ -1156,13 +1149,13 @@ export default function KaratekinTravelDemo() {
         </PhoneFrame>
         <FeatureCard
           x={40} y={140} delay={0.7}
-          icon="📅" accent={PRIMARY}
+          accent={PRIMARY}
           title="Aralık Seçimi"
           body="Giriş ve çıkış tarihini tek bir takvimden seç; aralık görsel olarak vurgulanır."
         />
         <FeatureCard
           x={40} y={310} delay={0.95}
-          icon="👥" accent={ACCENT}
+          accent={ACCENT}
           title="Yolcu ve Koltuk"
           body="Kişi sayısı, koltuk tercihi ve iletişim bilgilerini tek formda topla."
         />
@@ -1206,7 +1199,7 @@ export default function KaratekinTravelDemo() {
         </PhoneFrame>
         <FeatureCard
           x={760} y={200} delay={1.0}
-          icon="💬" accent={PRIMARY}
+          accent={PRIMARY}
           title="Anlık Mesajlaşma"
           body="Tur operatörüyle doğrudan iletişim; bildirim destekli, hızlı yanıt."
         />

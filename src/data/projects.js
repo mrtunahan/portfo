@@ -36,9 +36,9 @@ export const PROJECTS = [
     name: 'KaratekinTravel',
     url: null,
     displayUrl: null,
-    cardDesc: ['Karate odaklı', 'seyahat uygulaması'],
+    cardDesc: ['seyahat uygulaması'],
     screenDesc: [
-      'Karate turnuvalarına katılmak için',
+      'KaratekinTravelApp - Uzaktaki köyler artık çok daha yakın.',
       'seyahat planlama mobil uygulaması.',
       'Geliştirme aşamasında.',
     ],

@@ -19,6 +19,7 @@ import SocialBoard from './SocialBoard';
 import ProjectionScreen from './ProjectionScreen';
 import ProjectShelves from './ProjectShelves';
 import ScientificShelves from './ScientificShelves';
+import WallClock from './WallClock';
 import Rug from './Rug';
 import DemoModal from './DemoModal';
 
@@ -281,7 +282,7 @@ function AnimatedAmbient({ isLightOn }) {
   return (
     <ambientLight
       ref={ref}
-      intensity={isLightOn ? 0.6 : 0.03}
+      intensity={isLightOn ? 0.18 : 0.02}
     />
   );
 }
@@ -319,17 +320,17 @@ export default function PortfolioScene() {
     <div className="h-screen w-full overflow-hidden relative bg-black">
       {/* 3D Canvas */}
       <Canvas
-        shadows
-        camera={{ position: [0, 2.2, 4.5], fov: 55 }}
+        shadows="percentage"
+        camera={{ position: [0, 2.2, 4.5], fov: 52 }}
         gl={{
           antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.4,
+          toneMappingExposure: 1.1,
         }}
         dpr={[1, 2]}
       >
-        {/* Sis efekti — derinlik hissi */}
-        <fog attach="fog" args={['#000005', 8, 22]} />
+        {/* Sis efekti — mistik derinlik */}
+        <fog attach="fog" args={['#030008', 6, 16]} />
 
         {/* Ambient ışık */}
         <AnimatedAmbient isLightOn={isLightOn} />
@@ -339,9 +340,9 @@ export default function PortfolioScene() {
 
         {/* Yarım küre ışığı — tavan + zemin genel aydınlatma */}
         <hemisphereLight
-          skyColor="#b1c4e0"
-          groundColor="#1a1008"
-          intensity={isLightOn ? 0.35 : 0.02}
+          skyColor="#c0a0ff"
+          groundColor="#0a0510"
+          intensity={isLightOn ? 0.06 : 0.01}
         />
 
         <Suspense fallback={null}>
@@ -397,7 +398,10 @@ export default function PortfolioScene() {
           <ProjectShelves onSelect={handleCardSelect} />
 
           {/* Bilimsel proje rafları — arka duvar sağ (simetrik) */}
-          <ScientificShelves />
+          <ScientificShelves onSelect={handleCardSelect} />
+
+          {/* Gerçek zamanlı duvar saati — sağ yan duvar */}
+          <WallClock />
 
           {/* Projeksiyon perdesi + projektör — sol taraf */}
           <ProjectionScreen
@@ -426,20 +430,22 @@ export default function PortfolioScene() {
         {/* Kamera animasyonu */}
         <CameraController selectedProject={selectedProject} orbitRef={orbitRef} />
 
-        {/* Kamera kontrolü — kısıtlı */}
+        {/* Kamera kontrolü */}
         <OrbitControls
           ref={orbitRef}
           enablePan={false}
           enableZoom={true}
-          minDistance={2}
-          maxDistance={7}
-          minPolarAngle={Math.PI / 6}
-          maxPolarAngle={Math.PI / 2.2}
-          minAzimuthAngle={-Math.PI / 4}
-          maxAzimuthAngle={Math.PI / 4}
+          zoomSpeed={0.75}
+          rotateSpeed={0.5}
+          minDistance={1.0}
+          maxDistance={9.5}
+          minPolarAngle={Math.PI / 10}
+          maxPolarAngle={Math.PI / 1.88}
+          minAzimuthAngle={-Math.PI * 0.62}
+          maxAzimuthAngle={Math.PI * 0.62}
           target={[0, 1.2, -1]}
           enableDamping
-          dampingFactor={0.05}
+          dampingFactor={0.04}
         />
       </Canvas>
 
