@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useProjects, useScientificProjects } from '../data/store';
+import { DEMO_OPTIONS } from '../data/demos';
 
 const ADMIN_PASSWORD = 'admin123';
 const SESSION_KEY    = 'portfo:admin-auth';
@@ -14,6 +15,7 @@ const PROJECT_FIELDS = [
   { key: 'color',       label: 'Ana renk',          type: 'color' },
   { key: 'bgColor',     label: 'Arka plan',         type: 'color' },
   { key: 'status',      label: 'Durum',             type: 'select', options: ['live', 'dev'] },
+  { key: 'demoKey',     label: 'Demo',              type: 'select', options: DEMO_OPTIONS.map(o => o.value), labels: Object.fromEntries(DEMO_OPTIONS.map(o => [o.value, o.label])) },
 ];
 
 const SCI_FIELDS = [
@@ -31,6 +33,7 @@ const SCI_FIELDS = [
   { key: 'status',       label: 'Durum',             type: 'select', options: ['active', 'done'] },
   { key: 'color',        label: 'Ana renk',          type: 'color' },
   { key: 'bgColor',      label: 'Arka plan',         type: 'color' },
+  { key: 'demoKey',      label: 'Demo',              type: 'select', options: DEMO_OPTIONS.map(o => o.value), labels: Object.fromEntries(DEMO_OPTIONS.map(o => [o.value, o.label])) },
 ];
 
 function nextId(items) {
@@ -71,8 +74,14 @@ function Field({ field, value, onChange }) {
   }
   if (field.type === 'select') {
     return (
-      <select style={baseStyle} value={value || ''} onChange={(e) => onChange(e.target.value)}>
-        {field.options.map((o) => <option key={o} value={o}>{o}</option>)}
+      <select
+        style={baseStyle}
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
+      >
+        {field.options.map((o) => (
+          <option key={o ?? '__null'} value={o ?? ''}>{field.labels?.[o] ?? o}</option>
+        ))}
       </select>
     );
   }

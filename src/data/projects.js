@@ -14,6 +14,7 @@ export const PROJECTS = [
     color: '#00b4d8',
     bgColor: '#03045e',
     status: 'live',
+    demoKey: 'offline-asistan',
   },
   {
     id: 1,
@@ -30,6 +31,7 @@ export const PROJECTS = [
     color: '#40916c',
     bgColor: '#1b4332',
     status: 'live',
+    demoKey: null,
   },
   {
     id: 2,
@@ -46,5 +48,6 @@ export const PROJECTS = [
     color: '#f4a261',
     bgColor: '#3d1f00',
     status: 'dev',
+    demoKey: 'karatekin-travel',
   },
 ];

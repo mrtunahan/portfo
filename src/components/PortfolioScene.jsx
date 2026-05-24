@@ -455,7 +455,7 @@ export default function PortfolioScene() {
       {/* Demo Modal */}
       {showDemo && (
         <DemoModal
-          projectId={selectedProject?.id ?? 0}
+          demoKey={selectedProject?.demoKey}
           onClose={() => setShowDemo(false)}
         />
       )}

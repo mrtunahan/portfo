@@ -1,26 +1,30 @@
 import { useEffect } from 'react';
-import OfflineAsistanDemo from '../animations/OfflineAsistanDemo';
-import KaratekinTravelDemo from '../animations/KaratekinTravelDemo';
+import { DEMO_REGISTRY } from '../data/demos';
 
-const DEMOS = {
-  0: OfflineAsistanDemo,
-  2: KaratekinTravelDemo,
-};
-
-const DEMO_KEYS = {
-  0: 'offline-asistan-demo:t',
-  2: 'karatekin-travel-demo:t',
-};
-
-export default function DemoModal({ onClose, projectId = 0 }) {
-  const Demo = DEMOS[projectId] || OfflineAsistanDemo;
+export default function DemoModal({ onClose, demoKey }) {
+  const entry = demoKey ? DEMO_REGISTRY[demoKey] : null;
+  const Demo  = entry?.component;
 
   useEffect(() => {
-    try {
-      const key = DEMO_KEYS[projectId];
-      if (key) localStorage.removeItem(key);
-    } catch {}
-  }, [projectId]);
+    if (!entry?.timerKey) return;
+    try { localStorage.removeItem(entry.timerKey); } catch { /* ignore */ }
+  }, [entry]);
+
+  if (!Demo) {
+    return (
+      <div style={{
+        position:'fixed', inset:0, zIndex:9000,
+        background:'rgba(0,0,0,0.88)', backdropFilter:'blur(6px)',
+        display:'flex', alignItems:'center', justifyContent:'center',
+        color:'#caa46a', fontSize:18,
+      }}>
+        Bu proje için demo tanımlı değil.
+        <button onClick={onClose} style={{ marginLeft: 16, padding: '6px 14px', borderRadius: 6, background: '#3a2a18', color: '#f5c67a', border: '1px solid #5b4221', cursor: 'pointer' }}>
+          Kapat
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{

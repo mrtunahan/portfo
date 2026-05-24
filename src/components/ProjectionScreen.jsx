@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { Html } from '@react-three/drei';
-import { PROJECTS } from '../data/projects';
+import { useProjects, useScientificProjects } from '../data/store';
 
 /* ─── Proje detay dokusu ─── */
 function makeProjectDetailTex(project) {
@@ -233,10 +233,16 @@ function Projector({ position, rotation }) {
 /* ─── Ana bileşen ─── */
 export default function ProjectionScreen({ isLightOn, selectedProject, onClose, onDemoPlay }) {
   const codeTex = useMemo(() => makeScreenTex(), []);
-  const projectTextures = useMemo(() => PROJECTS.map(p => makeProjectDetailTex(p)), []);
+  const [projects]    = useProjects();
+  const [sciProjects] = useScientificProjects();
+  const projectTextures = useMemo(() => {
+    const map = new Map();
+    [...projects, ...sciProjects].forEach((p) => map.set(p.id, makeProjectDetailTex(p)));
+    return map;
+  }, [projects, sciProjects]);
 
   const activeTex = selectedProject !== null
-    ? projectTextures[selectedProject.id]
+    ? (projectTextures.get(selectedProject.id) || codeTex)
     : codeTex;
 
   // Ekran — odanın sol tarafı, halıyla aynı hizada (z ≈ -0.5)
@@ -399,7 +405,7 @@ export default function ProjectionScreen({ isLightOn, selectedProject, onClose, 
             )}
 
             {/* Demo Oynat butonu — demosu olan projeler için */}
-            {(selectedProject.id === 0 || selectedProject.id === 2) && (
+            {selectedProject.demoKey && (
               <button
                 onClick={onDemoPlay}
                 title="Demo Oynat"
