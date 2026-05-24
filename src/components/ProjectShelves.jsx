@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import * as THREE from 'three';
-import { PROJECTS } from '../data/projects';
+import ShelfDeck from './ShelfDeck';
+import { useProjects } from '../data/store';
 
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -22,7 +23,6 @@ function makeCardTex(project) {
   c.width = W; c.height = H;
   const ctx = c.getContext('2d');
 
-  // Arka plan
   ctx.fillStyle = project.bgColor;
   ctx.fillRect(0, 0, W, H);
 
@@ -42,7 +42,7 @@ function makeCardTex(project) {
   ctx.fillStyle = '#fff';
   ctx.font = 'bold 20px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText(`0${project.id + 1}`, W - 37, 37);
+  ctx.fillText(`0${(project.id ?? 0) + 1}`, W - 37, 37);
 
   // Proje adı
   ctx.shadowColor = 'rgba(0,0,0,0.6)';
@@ -56,7 +56,7 @@ function makeCardTex(project) {
   // Açıklama
   ctx.fillStyle = 'rgba(215,235,255,0.94)';
   ctx.font = '22px Arial';
-  project.cardDesc.forEach((line, i) => ctx.fillText(line, W / 2, 198 + i * 38));
+  (project.cardDesc || []).forEach((line, i) => ctx.fillText(line, W / 2, 198 + i * 38));
 
   // Ayırıcı
   const dg = ctx.createLinearGradient(24, 0, W - 24, 0);
@@ -86,7 +86,6 @@ function makeCardTex(project) {
   ctx.font = 'bold 22px Arial';
   ctx.fillText(badgeText, W / 2, 348);
 
-  // URL
   if (project.displayUrl) {
     ctx.fillStyle = 'rgba(160,180,200,0.85)';
     ctx.font = '17px monospace';
@@ -103,9 +102,8 @@ function makeCardTex(project) {
   return tex;
 }
 
-/* ─── Tek proje kartı ─── */
 function ProjectCard({ project, position, onSelect }) {
-  const tex = useMemo(() => makeCardTex(project), []); // eslint-disable-line
+  const tex = useMemo(() => makeCardTex(project), [project]);
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -114,7 +112,7 @@ function ProjectCard({ project, position, onSelect }) {
         scale={hovered ? [1.07, 1.07, 1.07] : [1, 1, 1]}
         onPointerOver={() => { setHovered(true);  document.body.style.cursor = 'pointer'; }}
         onPointerOut={() =>  { setHovered(false); document.body.style.cursor = 'default'; }}
-        onClick={(e) => { e.stopPropagation(); onSelect(project); }}
+        onClick={(e) => { e.stopPropagation(); onSelect && onSelect(project); }}
         castShadow
       >
         <boxGeometry args={[0.92, 1.15, 0.04]} />
@@ -155,50 +153,15 @@ function ProjectCard({ project, position, onSelect }) {
   );
 }
 
-/* ─── Raf + 3 proje kartı ─── */
 export default function ProjectShelves({ onSelect }) {
-  const shelfY = 2.05;
-  const wallZ  = -4.9;
-  const xs     = [-3.85, -2.4, -0.95];
-  const cx     = -2.4;   // raf merkezi x
-
+  const [projects] = useProjects();
   return (
-    <group>
-      {/* Ahşop raf tahtası */}
-      <mesh position={[cx, shelfY - 0.63, wallZ + 0.1]} castShadow receiveShadow>
-        <boxGeometry args={[4.1, 0.06, 0.22]} />
-        <meshStandardMaterial color="#2d1b0e" roughness={0.75} metalness={0.05} />
-      </mesh>
-
-      {/* Duvar montaj şeridi */}
-      <mesh position={[cx, shelfY - 0.56, wallZ + 0.015]}>
-        <boxGeometry args={[4.14, 0.07, 0.04]} />
-        <meshStandardMaterial color="#1a1008" roughness={0.6} metalness={0.3} />
-      </mesh>
-
-      {/* Metal braketler */}
-      {xs.map((x, i) => (
-        <group key={i}>
-          <mesh position={[x, shelfY - 0.63, wallZ + 0.12]}>
-            <boxGeometry args={[0.04, 0.03, 0.2]} />
-            <meshStandardMaterial color="#2a2a2a" metalness={0.7} roughness={0.3} />
-          </mesh>
-          <mesh position={[x, shelfY - 0.78, wallZ + 0.02]}>
-            <boxGeometry args={[0.03, 0.28, 0.03]} />
-            <meshStandardMaterial color="#2a2a2a" metalness={0.7} roughness={0.3} />
-          </mesh>
-        </group>
-      ))}
-
-      {/* Proje kartları */}
-      {PROJECTS.map((project, i) => (
-        <ProjectCard
-          key={project.id}
-          project={project}
-          position={[xs[i], shelfY, wallZ + 0.02]}
-          onSelect={onSelect}
-        />
-      ))}
-    </group>
+    <ShelfDeck
+      cx={-2.4}
+      items={projects}
+      renderCard={({ item, position, key }) => (
+        <ProjectCard key={key} project={item} position={position} onSelect={onSelect} />
+      )}
+    />
   );
 }
