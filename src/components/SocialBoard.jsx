@@ -10,7 +10,7 @@ function rr(ctx, x, y, w, h, r) {
   ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
 }
 function mkGithub() {
-  const s=512, cv=document.createElement('canvas'); cv.width=cv.height=s;
+  const s=1024, cv=document.createElement('canvas'); cv.width=cv.height=s;
   const c=cv.getContext('2d');
   rr(c,0,0,s,s,80); c.fillStyle='#161b22'; c.fill();
   const cx=s/2, cy=s*0.44, r=s*0.28;
@@ -23,10 +23,10 @@ function mkGithub() {
   c.fillStyle='#161b22';
   c.beginPath(); c.arc(cx-r*0.28,cy-r*0.06,r*0.1,0,Math.PI*2); c.fill();
   c.beginPath(); c.arc(cx+r*0.28,cy-r*0.06,r*0.1,0,Math.PI*2); c.fill();
-  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; return t;
+  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=16; return t;
 }
 function mkInstagram() {
-  const s=512, cv=document.createElement('canvas'); cv.width=cv.height=s;
+  const s=1024, cv=document.createElement('canvas'); cv.width=cv.height=s;
   const c=cv.getContext('2d');
   const g=c.createLinearGradient(s,s,0,0);
   g.addColorStop(0,'#ffd600'); g.addColorStop(0.18,'#ff6d00');
@@ -42,10 +42,10 @@ function mkInstagram() {
   c.beginPath(); c.arc(s/2,s/2,s*0.195,0,Math.PI*2); c.stroke();
   c.shadowBlur=0; c.fillStyle='#fff';
   c.beginPath(); c.arc(s*0.73,s*0.27,s*0.055,0,Math.PI*2); c.fill();
-  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; return t;
+  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=16; return t;
 }
 function mkLinkedIn() {
-  const s=512, cv=document.createElement('canvas'); cv.width=cv.height=s;
+  const s=1024, cv=document.createElement('canvas'); cv.width=cv.height=s;
   const c=cv.getContext('2d');
   rr(c,0,0,s,s,80); c.fillStyle='#0a66c2'; c.fill();
   const shine=c.createRadialGradient(s*0.28,s*0.22,0,s*0.34,s*0.28,s*0.7);
@@ -54,10 +54,10 @@ function mkLinkedIn() {
   c.fillStyle='#ffffff'; c.shadowColor='rgba(255,255,255,0.6)'; c.shadowBlur=18;
   c.font=`bold ${s*0.54}px Arial`; c.textAlign='center'; c.textBaseline='middle';
   c.fillText('in',s/2,s*0.48); c.shadowBlur=0;
-  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; return t;
+  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=16; return t;
 }
 function mkMail() {
-  const s=512, cv=document.createElement('canvas'); cv.width=cv.height=s;
+  const s=1024, cv=document.createElement('canvas'); cv.width=cv.height=s;
   const c=cv.getContext('2d');
   const bg=c.createLinearGradient(s/2,0,s/2,s);
   bg.addColorStop(0,'#5ac8fa'); bg.addColorStop(1,'#2673db');
@@ -74,7 +74,7 @@ function mkMail() {
   c.beginPath(); c.moveTo(ex,ey+eh); c.lineTo(ex+ew*0.42,ey+eh*0.5); c.stroke();
   c.beginPath(); c.moveTo(ex+ew,ey+eh); c.lineTo(ex+ew*0.58,ey+eh*0.5); c.stroke();
   c.shadowBlur=0;
-  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; return t;
+  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=16; return t;
 }
 
 /* PNG varsa PNG kullan, yoksa canvas fallback */
@@ -114,7 +114,7 @@ export default function SocialBoard({ position = [0, 0, 0] }) {
   const eTex = useIconTexture('/icons/mail.png',      mkMail);
 
   const plaqueTex = useMemo(() => {
-    const PW = 1024, PH = 256;
+    const PW = 2048, PH = 512;
     const c = document.createElement('canvas');
     c.width = PW; c.height = PH;
     const ctx = c.getContext('2d');
@@ -123,22 +123,22 @@ export default function SocialBoard({ position = [0, 0, 0] }) {
     bg.addColorStop(1, '#110c04');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, PW, PH);
-    ctx.strokeStyle = 'rgba(245,158,11,0.55)';
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(36, 28); ctx.lineTo(PW - 36, 28); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(36, PH - 28); ctx.lineTo(PW - 36, PH - 28); ctx.stroke();
+    ctx.strokeStyle = 'rgba(245,158,11,0.65)';
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(72, 56); ctx.lineTo(PW - 72, 56); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(72, PH - 56); ctx.lineTo(PW - 72, PH - 56); ctx.stroke();
     // Glow katmanı
     ctx.shadowColor = '#f5c67a';
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = '#ffe0a0';
-    ctx.font = 'bold 96px Arial';
+    ctx.shadowBlur = 32;
+    ctx.fillStyle = '#ffe8b0';
+    ctx.font = 'bold 188px Arial';
     ctx.textAlign = 'center';
-    ctx.letterSpacing = '12px';
-    ctx.fillText('İLETİŞİM', PW / 2, PH / 2 + 34);
+    ctx.letterSpacing = '22px';
+    ctx.fillText('İLETİŞİM', PW / 2, PH / 2 + 68);
     // Keskin ana metin üstüne
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#f5c67a';
-    ctx.fillText('İLETİŞİM', PW / 2, PH / 2 + 34);
+    ctx.fillText('İLETİŞİM', PW / 2, PH / 2 + 68);
     const t = new THREE.CanvasTexture(c);
     t.colorSpace = THREE.SRGBColorSpace;
     t.anisotropy = 16;

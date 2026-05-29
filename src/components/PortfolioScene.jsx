@@ -22,6 +22,7 @@ import ScientificShelves from './ScientificShelves';
 import WallClock from './WallClock';
 import Rug from './Rug';
 import DemoModal from './DemoModal';
+import Workstation from './Workstation';
 
 /* ─── Kamera animasyon kontrolörü ─── */
 const _PROJ_CAM_POS    = new THREE.Vector3(-1.55, 2.35, -0.8);
@@ -402,6 +403,9 @@ export default function PortfolioScene() {
 
           {/* Gerçek zamanlı duvar saati — sağ yan duvar */}
           <WallClock />
+
+          {/* Masaüstü çalışma alanı — sağ duvar, kitaplığın solu */}
+          <Workstation position={[5.5, 0, -4.0]} />
 
           {/* Projeksiyon perdesi + projektör — sol taraf */}
           <ProjectionScreen
