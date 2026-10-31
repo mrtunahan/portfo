@@ -1,54 +1,64 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { DEMO_REGISTRY } from '../data/demos';
 
+/**
+ * Demolar koyu bir sahnede oynuyor; sayfanın geri kalanı açık zeminli.
+ * Bu karşıtlık bilinçli: demo ayrı bir bağlam, sayfanın parçası değil.
+ */
 export default function DemoModal({ onClose, demoKey }) {
   const entry = demoKey ? DEMO_REGISTRY[demoKey] : null;
-  const Demo  = entry?.component;
+  const Demo = entry?.component;
+  const closeRef = useRef(null);
 
+  // Sayımı sıfırla, kaydırmayı kilitle, Esc ile kapat, odağı yakala
   useEffect(() => {
-    if (!entry?.timerKey) return;
-    try { localStorage.removeItem(entry.timerKey); } catch { /* ignore */ }
-  }, [entry]);
+    if (entry?.timerKey) {
+      try {
+        localStorage.removeItem(entry.timerKey);
+      } catch {
+        /* yoksay */
+      }
+    }
 
-  if (!Demo) {
-    return (
-      <div style={{
-        position:'fixed', inset:0, zIndex:9000,
-        background:'rgba(0,0,0,0.88)', backdropFilter:'blur(6px)',
-        display:'flex', alignItems:'center', justifyContent:'center',
-        color:'#caa46a', fontSize:18,
-      }}>
-        Bu proje için demo tanımlı değil.
-        <button onClick={onClose} style={{ marginLeft: 16, padding: '6px 14px', borderRadius: 6, background: '#3a2a18', color: '#f5c67a', border: '1px solid #5b4221', cursor: 'pointer' }}>
-          Kapat
-        </button>
-      </div>
-    );
-  }
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [entry, onClose]);
 
   return (
-    <div style={{
-      position:'fixed', inset:0, zIndex:9000,
-      background:'rgba(0,0,0,0.88)',
-      backdropFilter:'blur(6px)',
-    }}>
-      <Demo />
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={entry ? `${entry.label} demosu` : 'Demo'}
+      className="fixed inset-0 z-[9000] bg-ink/95"
+      style={{ animation: 'fadeIn .25s ease' }}
+    >
+      {Demo ? (
+        <Demo />
+      ) : (
+        <div className="flex h-full items-center justify-center">
+          <p className="t-body text-paper">Bu proje için demo tanımlı değil.</p>
+        </div>
+      )}
 
       <button
+        ref={closeRef}
+        type="button"
         onClick={onClose}
-        title="Kapat"
-        style={{
-          position:'absolute', top:14, right:18, zIndex:9100,
-          width:36, height:36, borderRadius:'50%',
-          background:'rgba(220,50,50,0.88)',
-          color:'#fff', border:'1px solid rgba(255,120,120,0.4)',
-          cursor:'pointer', fontSize:18, fontWeight:'bold',
-          display:'flex', alignItems:'center', justifyContent:'center',
-          boxShadow:'0 0 14px rgba(255,50,50,0.45)',
-          lineHeight:1,
-        }}
+        className="absolute right-5 top-5 z-[9100] border border-paper/30 px-4 py-2 text-paper"
+        style={{ fontSize: '0.85rem', fontVariationSettings: "'wdth' 86, 'wght' 600" }}
       >
-        ✕
+        Kapat
       </button>
     </div>
   );

@@ -2,38 +2,45 @@ import { useState } from 'react';
 import { useProjects, useScientificProjects } from '../data/store';
 import { DEMO_OPTIONS } from '../data/demos';
 
+/* UYARI: bu şifre istemci tarafında, derlenmiş pakette açıkça görünür.
+   Panelin koruduğu tek şey tarayıcıdaki localStorage içeriği olduğu için
+   kabul edilebilir; gerçek bir yetkilendirme değil. */
 const ADMIN_PASSWORD = 'admin123';
-const SESSION_KEY    = 'portfo:admin-auth';
+const SESSION_KEY = 'portfo:admin-auth';
 
+const DEMO_FIELD = {
+  key: 'demoKey',
+  label: 'Demo',
+  type: 'select',
+  options: DEMO_OPTIONS.map((o) => o.value),
+  labels: Object.fromEntries(DEMO_OPTIONS.map((o) => [o.value, o.label])),
+};
+
+/* Renk alanları kaldırıldı: yeni tasarım tek vurgu rengi kullanıyor,
+   proje başına renk artık hiçbir yerde okunmuyor. */
 const PROJECT_FIELDS = [
-  { key: 'name',        label: 'İsim',              type: 'text' },
-  { key: 'url',         label: 'URL',               type: 'text' },
-  { key: 'displayUrl',  label: 'Görünen URL',       type: 'text' },
-  { key: 'cardDesc',    label: 'Kart açıklaması',   type: 'lines' },
-  { key: 'screenDesc',  label: 'Ekran açıklaması',  type: 'lines' },
-  { key: 'tech',        label: 'Teknolojiler',      type: 'text' },
-  { key: 'color',       label: 'Ana renk',          type: 'color' },
-  { key: 'bgColor',     label: 'Arka plan',         type: 'color' },
-  { key: 'status',      label: 'Durum',             type: 'select', options: ['live', 'dev'] },
-  { key: 'demoKey',     label: 'Demo',              type: 'select', options: DEMO_OPTIONS.map(o => o.value), labels: Object.fromEntries(DEMO_OPTIONS.map(o => [o.value, o.label])) },
+  { key: 'name', label: 'İsim', type: 'text' },
+  { key: 'url', label: 'URL', type: 'text' },
+  { key: 'displayUrl', label: 'Görünen URL', type: 'text' },
+  { key: 'cardDesc', label: 'Kart açıklaması', type: 'lines' },
+  { key: 'screenDesc', label: 'Açıklama', type: 'lines' },
+  { key: 'tech', label: 'Teknolojiler', type: 'text' },
+  { key: 'status', label: 'Durum', type: 'select', options: ['live', 'dev'] },
+  DEMO_FIELD,
 ];
 
 const SCI_FIELDS = [
-  { key: 'name',         label: 'İsim',              type: 'text' },
-  { key: 'shortName',    label: 'Kısa isim',         type: 'text' },
-  { key: 'program',      label: 'Program',           type: 'text' },
-  { key: 'no',           label: 'Proje no',          type: 'text' },
-  { key: 'lines',        label: 'Kart satırları',    type: 'lines' },
-  { key: 'screenDesc',   label: 'Ekran açıklaması',  type: 'lines' },
-  { key: 'tech',         label: 'Teknolojiler',      type: 'text' },
-  { key: 'subTitle',     label: 'Alt başlık',        type: 'text' },
-  { key: 'displayLabel', label: 'Görünen etiket',    type: 'text' },
-  { key: 'role',         label: 'Görev',             type: 'text' },
-  { key: 'year',         label: 'Yıl',               type: 'text' },
-  { key: 'status',       label: 'Durum',             type: 'select', options: ['active', 'done'] },
-  { key: 'color',        label: 'Ana renk',          type: 'color' },
-  { key: 'bgColor',      label: 'Arka plan',         type: 'color' },
-  { key: 'demoKey',      label: 'Demo',              type: 'select', options: DEMO_OPTIONS.map(o => o.value), labels: Object.fromEntries(DEMO_OPTIONS.map(o => [o.value, o.label])) },
+  { key: 'name', label: 'İsim', type: 'text' },
+  { key: 'shortName', label: 'Kısa isim', type: 'text' },
+  { key: 'program', label: 'Program', type: 'text' },
+  { key: 'no', label: 'Proje no', type: 'text' },
+  { key: 'lines', label: 'Kart satırları', type: 'lines' },
+  { key: 'screenDesc', label: 'Açıklama', type: 'lines' },
+  { key: 'tech', label: 'Teknolojiler', type: 'text' },
+  { key: 'subTitle', label: 'Alt başlık', type: 'text' },
+  { key: 'role', label: 'Görev', type: 'text' },
+  { key: 'year', label: 'Yıl', type: 'text' },
+  { key: 'status', label: 'Durum', type: 'select', options: ['active', 'done'] },
 ];
 
 function nextId(items) {
@@ -45,27 +52,20 @@ function blankFromFields(fields, items) {
   fields.forEach((f) => {
     if (f.type === 'lines') obj[f.key] = [];
     else if (f.type === 'select') obj[f.key] = f.options[0];
-    else if (f.type === 'color') obj[f.key] = '#888888';
     else obj[f.key] = '';
   });
   return obj;
 }
 
-function Field({ field, value, onChange }) {
-  const baseStyle = {
-    width: '100%',
-    padding: '6px 8px',
-    background: '#0d0904',
-    color: '#f5e6c4',
-    border: '1px solid #5b4221',
-    borderRadius: 4,
-    fontSize: 13,
-  };
+const INPUT =
+  'w-full border border-rule bg-paper px-3 py-2 text-[0.9rem] text-ink ' +
+  'focus:border-accent focus:outline-none';
 
+function Field({ field, value, onChange }) {
   if (field.type === 'lines') {
     return (
       <textarea
-        style={{ ...baseStyle, minHeight: 60, fontFamily: 'inherit' }}
+        className={`${INPUT} min-h-[72px] font-sans`}
         value={(value || []).join('\n')}
         onChange={(e) => onChange(e.target.value.split('\n'))}
         placeholder="Her satır ayrı bir bölüm"
@@ -75,25 +75,26 @@ function Field({ field, value, onChange }) {
   if (field.type === 'select') {
     return (
       <select
-        style={baseStyle}
+        className={INPUT}
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
       >
         {field.options.map((o) => (
-          <option key={o ?? '__null'} value={o ?? ''}>{field.labels?.[o] ?? o}</option>
+          <option key={o ?? '__null'} value={o ?? ''}>
+            {field.labels?.[o] ?? o}
+          </option>
         ))}
       </select>
     );
   }
-  if (field.type === 'color') {
-    return (
-      <div style={{ display: 'flex', gap: 6 }}>
-        <input type="color" value={value || '#000000'} onChange={(e) => onChange(e.target.value)} style={{ width: 40, height: 32, border: 0, background: 'transparent' }} />
-        <input type="text" style={baseStyle} value={value || ''} onChange={(e) => onChange(e.target.value)} />
-      </div>
-    );
-  }
-  return <input type="text" style={baseStyle} value={value || ''} onChange={(e) => onChange(e.target.value)} />;
+  return (
+    <input
+      type="text"
+      className={INPUT}
+      value={value || ''}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
 }
 
 function ItemEditor({ item, fields, onSave, onCancel, onDelete }) {
@@ -101,25 +102,29 @@ function ItemEditor({ item, fields, onSave, onCancel, onDelete }) {
   const set = (k, v) => setDraft((d) => ({ ...d, [k]: v }));
 
   return (
-    <div style={{ background: '#15100a', border: '1px solid #5b4221', borderRadius: 8, padding: 14, marginBottom: 10 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+    <div className="border border-ink p-5 mb-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {fields.map((f) => (
-          <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: 4, gridColumn: f.type === 'lines' ? 'span 2' : 'span 1' }}>
-            <span style={{ fontSize: 11, color: '#caa46a', textTransform: 'uppercase', letterSpacing: 1 }}>{f.label}</span>
+          <label
+            key={f.key}
+            className={`flex flex-col gap-1.5 ${f.type === 'lines' ? 'md:col-span-2' : ''}`}
+          >
+            <span className="t-meta">{f.label}</span>
             <Field field={f} value={draft[f.key]} onChange={(v) => set(f.key, v)} />
           </label>
         ))}
       </div>
-      <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'flex-end' }}>
+
+      <div className="mt-5 flex flex-wrap justify-end gap-3">
         {onDelete && (
-          <button onClick={onDelete} style={{ background: '#5a1f1f', color: '#ffd0d0', border: '1px solid #884545', padding: '6px 14px', borderRadius: 4, cursor: 'pointer' }}>
+          <button type="button" className="btn btn--ghost" onClick={onDelete}>
             Sil
           </button>
         )}
-        <button onClick={onCancel} style={{ background: '#2a2018', color: '#f5e6c4', border: '1px solid #5b4221', padding: '6px 14px', borderRadius: 4, cursor: 'pointer' }}>
-          İptal
+        <button type="button" className="btn btn--ghost" onClick={onCancel}>
+          Vazgeç
         </button>
-        <button onClick={() => onSave(draft)} style={{ background: '#4a6c2a', color: '#fff', border: '1px solid #6fa040', padding: '6px 14px', borderRadius: 4, cursor: 'pointer' }}>
+        <button type="button" className="btn" onClick={() => onSave(draft)}>
           Kaydet
         </button>
       </div>
@@ -127,20 +132,26 @@ function ItemEditor({ item, fields, onSave, onCancel, onDelete }) {
   );
 }
 
-function ItemRow({ label, color, onEdit, onDelete }) {
+function ItemRow({ label, status, onEdit, onDelete }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#1a130a', border: '1px solid #3a2b18', borderRadius: 6, marginBottom: 6 }}>
-      <div style={{ width: 18, height: 18, borderRadius: 4, background: color || '#444' }} />
-      <div style={{ flex: 1, color: '#f5e6c4' }}>{label}</div>
-      <button onClick={onEdit} style={{ background: '#2c3e5a', color: '#cfe2ff', border: '1px solid #4d6ea0', padding: '4px 12px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Düzenle</button>
-      <button onClick={onDelete} style={{ background: '#5a1f1f', color: '#ffd0d0', border: '1px solid #884545', padding: '4px 12px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Sil</button>
+    <div className="rule-b flex items-center gap-5 py-4">
+      <span className="t-row flex-1" style={{ fontSize: '1.15rem' }}>
+        {label}
+      </span>
+      <span className="t-meta hidden sm:block">{status}</span>
+      <button type="button" className="t-meta link" onClick={onEdit}>
+        Düzenle
+      </button>
+      <button type="button" className="t-meta link" onClick={onDelete}>
+        Sil
+      </button>
     </div>
   );
 }
 
 function Section({ title, items, save, reset, fields, labelOf }) {
   const [editingId, setEditingId] = useState(null);
-  const [creating, setCreating]   = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const saveItem = (next) => {
     if (creating) {
@@ -151,97 +162,136 @@ function Section({ title, items, save, reset, fields, labelOf }) {
       setEditingId(null);
     }
   };
+
   const deleteItem = (id) => {
-    if (!confirm('Bu kartı silmek istiyor musun?')) return;
+    if (!confirm('Bu kaydı silmek istiyor musun?')) return;
     save(items.filter((p) => p.id !== id));
     setEditingId(null);
   };
 
   return (
-    <section style={{ marginBottom: 32 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-        <h2 style={{ color: '#f5c67a', fontSize: 18, margin: 0, flex: 1 }}>{title}</h2>
-        <button onClick={() => { setCreating(true); setEditingId(null); }}
-          style={{ background: '#4a6c2a', color: '#fff', border: '1px solid #6fa040', padding: '6px 14px', borderRadius: 4, cursor: 'pointer' }}>
-          + Yeni Ekle
+    <section className="mb-20">
+      <div className="rule-b flex flex-wrap items-baseline gap-5 pb-4">
+        <h2 className="t-section flex-1" style={{ fontSize: 'clamp(1.5rem,3vw,2.25rem)' }}>
+          {title}
+        </h2>
+        <button
+          type="button"
+          className="t-meta link"
+          onClick={() => {
+            setCreating(true);
+            setEditingId(null);
+          }}
+        >
+          Yeni ekle
         </button>
-        <button onClick={() => { if (confirm('Tüm değişiklikleri silip varsayılana dönülsün mü?')) reset(); }}
-          style={{ background: '#3a2a18', color: '#caa46a', border: '1px solid #5b4221', padding: '6px 14px', borderRadius: 4, cursor: 'pointer' }}>
-          Varsayılana Dön
+        <button
+          type="button"
+          className="t-meta link"
+          onClick={() => {
+            if (confirm('Tüm değişiklikleri silip varsayılana dönülsün mü?')) reset();
+          }}
+        >
+          Varsayılana dön
         </button>
       </div>
 
-      {creating && (
-        <ItemEditor
-          item={blankFromFields(fields, items)}
-          fields={fields}
-          onSave={saveItem}
-          onCancel={() => setCreating(false)}
-        />
-      )}
-
-      {items.map((item) =>
-        editingId === item.id ? (
+      <div className="mt-4">
+        {creating && (
           <ItemEditor
-            key={item.id}
-            item={item}
+            item={blankFromFields(fields, items)}
             fields={fields}
             onSave={saveItem}
-            onCancel={() => setEditingId(null)}
-            onDelete={() => deleteItem(item.id)}
+            onCancel={() => setCreating(false)}
           />
-        ) : (
-          <ItemRow
-            key={item.id}
-            label={labelOf(item)}
-            color={item.color}
-            onEdit={() => { setEditingId(item.id); setCreating(false); }}
-            onDelete={() => deleteItem(item.id)}
-          />
-        )
-      )}
+        )}
 
-      {items.length === 0 && !creating && (
-        <div style={{ color: '#7a6645', padding: 14, fontStyle: 'italic' }}>Henüz kart yok.</div>
-      )}
+        {items.map((item) =>
+          editingId === item.id ? (
+            <ItemEditor
+              key={item.id}
+              item={item}
+              fields={fields}
+              onSave={saveItem}
+              onCancel={() => setEditingId(null)}
+              onDelete={() => deleteItem(item.id)}
+            />
+          ) : (
+            <ItemRow
+              key={item.id}
+              label={labelOf(item)}
+              status={item.status}
+              onEdit={() => {
+                setEditingId(item.id);
+                setCreating(false);
+              }}
+              onDelete={() => deleteItem(item.id)}
+            />
+          ),
+        )}
+
+        {items.length === 0 && !creating && (
+          <p className="t-body py-6">Henüz kayıt yok. Yeni ekle ile başla.</p>
+        )}
+      </div>
     </section>
   );
 }
 
 function Login({ onAuth }) {
-  const [pw, setPw]       = useState('');
+  const [pw, setPw] = useState('');
   const [error, setError] = useState('');
 
   const submit = (e) => {
     e.preventDefault();
     if (pw === ADMIN_PASSWORD) {
-      try { sessionStorage.setItem(SESSION_KEY, '1'); } catch { /* ignore */ }
+      try {
+        sessionStorage.setItem(SESSION_KEY, '1');
+      } catch {
+        /* yoksay */
+      }
       onAuth();
     } else {
-      setError('Şifre yanlış');
+      setError('Şifre eşleşmedi. Tekrar dene.');
     }
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#0a0604' }}>
-      <form onSubmit={submit} style={{ background: '#15100a', border: '1px solid #5b4221', borderRadius: 8, padding: 32, minWidth: 320 }}>
-        <h1 style={{ color: '#f5c67a', margin: 0, marginBottom: 18, fontSize: 22 }}>Admin Girişi</h1>
-        <input
-          type="password"
-          autoFocus
-          value={pw}
-          onChange={(e) => { setPw(e.target.value); setError(''); }}
-          placeholder="Şifre"
-          style={{ width: '100%', padding: '10px 12px', background: '#0d0904', color: '#f5e6c4', border: '1px solid #5b4221', borderRadius: 4, fontSize: 14, boxSizing: 'border-box' }}
-        />
-        {error && <div style={{ color: '#ff9090', fontSize: 12, marginTop: 8 }}>{error}</div>}
-        <button type="submit" style={{ marginTop: 14, width: '100%', background: '#4a6c2a', color: '#fff', border: '1px solid #6fa040', padding: '10px 14px', borderRadius: 4, cursor: 'pointer', fontSize: 14 }}>
-          Giriş
+    <div className="flex min-h-screen items-center justify-center px-6">
+      <form onSubmit={submit} className="w-full max-w-sm">
+        <h1 className="t-section mb-8" style={{ fontSize: 'clamp(1.75rem,4vw,2.5rem)' }}>
+          Yönetim
+        </h1>
+
+        <label className="flex flex-col gap-2">
+          <span className="t-meta">Şifre</span>
+          <input
+            type="password"
+            autoFocus
+            value={pw}
+            onChange={(e) => {
+              setPw(e.target.value);
+              setError('');
+            }}
+            className={INPUT}
+          />
+        </label>
+
+        {error && (
+          <p className="t-meta mt-2" style={{ color: 'var(--accent)' }}>
+            {error}
+          </p>
+        )}
+
+        <button type="submit" className="btn mt-5 w-full">
+          Gir
         </button>
-        <div style={{ color: '#7a6645', fontSize: 11, marginTop: 14, lineHeight: 1.5 }}>
-          Bu panel yerel (localStorage) tabanlıdır — değişiklikler yalnızca bu tarayıcıda görünür.
-          Şifre <code>src/components/AdminPanel.jsx</code> içinde değiştirilebilir.
-        </div>
+
+        <p className="t-body mt-8" style={{ fontSize: '0.85rem' }}>
+          Bu panel yalnızca bu tarayıcının yerel belleğini düzenler; değişiklikler
+          başka cihazlarda görünmez. Şifre istemci kodunda tutulduğu için gerçek bir
+          güvenlik katmanı değil.
+        </p>
       </form>
     </div>
   );
@@ -249,49 +299,67 @@ function Login({ onAuth }) {
 
 export default function AdminPanel() {
   const [authed, setAuthed] = useState(() => {
-    try { return sessionStorage.getItem(SESSION_KEY) === '1'; } catch { return false; }
+    try {
+      return sessionStorage.getItem(SESSION_KEY) === '1';
+    } catch {
+      return false;
+    }
   });
-  const [projects, saveProjects, resetProjects]    = useProjects();
-  const [sciProjs, saveSciProjs, resetSciProjs]    = useScientificProjects();
+
+  const [projects, saveProjects, resetProjects] = useProjects();
+  const [sciProjs, saveSciProjs, resetSciProjs] = useScientificProjects();
 
   if (!authed) return <Login onAuth={() => setAuthed(true)} />;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0604', padding: '24px 32px', color: '#f5e6c4', fontFamily: 'system-ui, sans-serif' }}>
-      <header style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28, paddingBottom: 14, borderBottom: '1px solid #3a2b18' }}>
-        <h1 style={{ color: '#f5c67a', margin: 0, fontSize: 26, flex: 1 }}>Portfolyo Yönetim Paneli</h1>
-        <a href="#" onClick={() => { window.location.hash = ''; window.location.reload(); }}
-          style={{ background: '#2c3e5a', color: '#cfe2ff', border: '1px solid #4d6ea0', padding: '8px 16px', borderRadius: 4, textDecoration: 'none', fontSize: 13 }}>
-          ← Portfolyoya Dön
+    <div className="shell min-h-screen py-10">
+      <header className="rule-b mb-16 flex flex-wrap items-baseline gap-6 pb-5">
+        <h1 className="flex-1" style={{ fontVariationSettings: "'wdth' 108, 'wght' 700", fontSize: '1.35rem' }}>
+          Portfolyo yönetimi
+        </h1>
+        <a
+          className="t-meta link"
+          href="#"
+          onClick={() => {
+            window.location.hash = '';
+            window.location.reload();
+          }}
+        >
+          Siteye dön
         </a>
-        <button onClick={() => { try { sessionStorage.removeItem(SESSION_KEY); } catch { /* ignore */ } setAuthed(false); }}
-          style={{ background: '#3a2a18', color: '#caa46a', border: '1px solid #5b4221', padding: '8px 16px', borderRadius: 4, cursor: 'pointer', fontSize: 13 }}>
+        <button
+          type="button"
+          className="t-meta link"
+          onClick={() => {
+            try {
+              sessionStorage.removeItem(SESSION_KEY);
+            } catch {
+              /* yoksay */
+            }
+            setAuthed(false);
+          }}
+        >
           Çıkış
         </button>
       </header>
 
-      <div style={{ maxWidth: 960, margin: '0 auto' }}>
-        <Section
-          title="Projeler"
-          items={projects}
-          save={saveProjects}
-          reset={resetProjects}
-          fields={PROJECT_FIELDS}
-          labelOf={(p) => p.name || '(isimsiz)'}
-        />
-        <Section
-          title="Bilimsel Projeler"
-          items={sciProjs}
-          save={saveSciProjs}
-          reset={resetSciProjs}
-          fields={SCI_FIELDS}
-          labelOf={(p) => p.shortName || '(isimsiz)'}
-        />
+      <Section
+        title="Yazılım projeleri"
+        items={projects}
+        save={saveProjects}
+        reset={resetProjects}
+        fields={PROJECT_FIELDS}
+        labelOf={(p) => p.name || '(isimsiz)'}
+      />
 
-        <div style={{ color: '#7a6645', fontSize: 12, marginTop: 24, lineHeight: 1.6 }}>
-          Değişiklikler tarayıcının localStorage'ına kaydedilir. Portfolyo sayfasını yeniden yüklediğinde yeni içerikler görünür.
-        </div>
-      </div>
+      <Section
+        title="Araştırma projeleri"
+        items={sciProjs}
+        save={saveSciProjs}
+        reset={resetSciProjs}
+        fields={SCI_FIELDS}
+        labelOf={(p) => p.shortName || p.name || '(isimsiz)'}
+      />
     </div>
   );
 }

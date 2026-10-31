@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import PortfolioScene from './components/PortfolioScene';
+import Site from './components/Site';
 import AdminPanel from './components/AdminPanel';
 
 function useHashRoute() {
@@ -15,5 +15,5 @@ function useHashRoute() {
 export default function App() {
   const hash = useHashRoute();
   if (hash === '#admin') return <AdminPanel />;
-  return <PortfolioScene />;
+  return <Site />;
 }

@@ -1,31 +1,26 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-      },
       colors: {
-        amber: {
-          warm: '#ffddaa',
-        },
+        paper: '#FAFAF8',
+        ink: '#141519',
+        mute: '#6E6F76',
+        rule: '#DEDDD6',
+        accent: '#1F3CF0',
+        accentSoft: '#E6E9FE',
       },
-      keyframes: {
-        'fade-up': {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        'glow-pulse': {
-          '0%, 100%': { opacity: '0.6' },
-          '50%': { opacity: '1' },
-        },
+      fontFamily: {
+        sans: ['Archivo Variable', 'Archivo', 'system-ui', 'sans-serif'],
       },
-      animation: {
-        'fade-up': 'fade-up 0.8s ease-out forwards',
-        'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
+      letterSpacing: {
+        tightest: '-0.045em',
+      },
+      maxWidth: {
+        measure: '64ch',
       },
     },
   },
   plugins: [],
-}
+};

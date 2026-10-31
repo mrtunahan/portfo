@@ -1,54 +1,319 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Archivo değişken font, projeye gömülü (ağırlık 100–900, genişlik %62–125).
+   Google Fonts'a dışarıdan istek atılmıyor. */
+@import '@fontsource-variable/archivo/standard.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Global Reset ── */
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-  font-family: 'Inter', system-ui, sans-serif;
-  background: #000;
-}
+/* ───────────────────────────────────────────────────────────
+   Temel
+   Tek tip ailesi: Archivo (değişken). Genişlik ekseni (wdth)
+   burada dekorasyon değil, hiyerarşinin taşıyıcısı.
+   ─────────────────────────────────────────────────────────── */
 
-/* ── Custom Utilities ── */
-@layer utilities {
-  .glass {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
+:root {
+  --paper: #fafaf8;
+  --ink: #141519;
+  --mute: #6e6f76;
+  --rule: #deddd6;
+  --accent: #1f3cf0;
 
-  .glass-hover:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.15);
-  }
-
-  .text-shadow-glow {
-    text-shadow: 0 0 40px rgba(245, 158, 11, 0.3),
-                 0 0 80px rgba(245, 158, 11, 0.1);
-  }
-
-  .stagger-1 { animation-delay: 0.1s; }
-  .stagger-2 { animation-delay: 0.2s; }
-  .stagger-3 { animation-delay: 0.3s; }
-  .stagger-4 { animation-delay: 0.4s; }
-  .stagger-5 { animation-delay: 0.5s; }
-  .stagger-6 { animation-delay: 0.6s; }
-  .stagger-7 { animation-delay: 0.7s; }
-  .stagger-8 { animation-delay: 0.8s; }
-}
-
-/* ── Scrollbar Hide (just in case) ── */
-::-webkit-scrollbar {
-  display: none;
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --spine: 0px; /* JS ızgara göstergesi için */
 }
 
 * {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  font-variation-settings: 'wdth' 100, 'wght' 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Okuma akışını bozmayan, görünür odak halkası */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ─── Izgara: 12 kolon, isteğe bağlı görünür ─── */
+
+.shell {
+  width: 100%;
+  max-width: 1680px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.grid12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(0.75rem, 1.6vw, 1.75rem);
+}
+
+/* "g" tuşuyla açılan ızgara çizgileri — tasarımcı kontrolü */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.grid-overlay[data-on='true'] {
+  opacity: 1;
+}
+
+.grid-overlay__col {
+  border-left: 1px solid rgba(31, 60, 240, 0.16);
+}
+
+.grid-overlay__col:last-child {
+  border-right: 1px solid rgba(31, 60, 240, 0.16);
+}
+
+/* ─── Tipografi ölçeği ─── */
+
+.t-display {
+  font-size: clamp(3.25rem, 13.5vw, 13rem);
+  line-height: 0.84;
+  letter-spacing: -0.045em;
+  font-variation-settings: 'wdth' 112, 'wght' 800;
+  margin: 0;
+}
+
+.t-section {
+  font-size: clamp(1.75rem, 4.2vw, 3.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  font-variation-settings: 'wdth' 108, 'wght' 700;
+  margin: 0;
+}
+
+.t-row {
+  font-size: clamp(1.25rem, 2.9vw, 2.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-variation-settings: 'wdth' 104, 'wght' 600;
+}
+
+.t-lead {
+  font-size: clamp(1.05rem, 1.55vw, 1.3rem);
+  line-height: 1.5;
+  font-variation-settings: 'wdth' 96, 'wght' 400;
+  max-width: 58ch;
+}
+
+.t-body {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  font-variation-settings: 'wdth' 96, 'wght' 400;
+  max-width: 62ch;
+}
+
+/* Dar kesim: veri ve kenar bilgisi. Büyük harf değil, daraltma ayırıyor. */
+.t-meta {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  letter-spacing: 0.005em;
+  font-variation-settings: 'wdth' 76, 'wght' 500;
+  color: var(--mute);
+}
+
+.t-figure {
+  font-size: clamp(2.5rem, 6vw, 4.75rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-variation-settings: 'wdth' 70, 'wght' 700;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* ─── Kurallar / çizgiler ─── */
+
+.rule-t {
+  border-top: 1px solid var(--rule);
+}
+
+.rule-b {
+  border-bottom: 1px solid var(--rule);
+}
+
+/* ─── Dizin satırı (projeler) ─── */
+
+/* display tanımlanmıyor: satır .grid12 ile birlikte kullanılıyor,
+   burada display:block yazmak ızgarayı ezerdi. */
+.row {
+  position: relative;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: clamp(1.1rem, 2.2vw, 1.9rem) 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+/* Hover'da kart kalkmaz; soldan ince bir işaret çizgisi büyür. */
+.row::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--gutter) * -0.5);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.row[data-active='true']::before,
+.row:hover::before,
+.row:focus-visible::before {
+  transform: scaleY(1);
+}
+
+.row__title {
+  transition: font-variation-settings 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.row:hover .row__title,
+.row[data-active='true'] .row__title {
+  font-variation-settings: 'wdth' 118, 'wght' 700;
+}
+
+/* Açılır gövde — yükseklik JS ile ölçülüp animasyonlanıyor */
+.row__panel {
+  overflow: hidden;
+  height: 0;
+  transition: height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.row__panelInner {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease 0.08s, transform 0.4s ease 0.08s;
+  padding-bottom: 2rem;
+}
+
+.row[data-active='true'] .row__panelInner {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── Bağlantılar ─── */
+
+.link {
+  color: inherit;
+  text-decoration: none;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  background-position: left 100%;
+  transition: background-size 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.2s;
+  padding-bottom: 2px;
+}
+
+.link:hover,
+.link:focus-visible {
+  background-size: 100% 1px;
+  color: var(--accent);
+}
+
+.btn {
+  display: inline-block;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.7rem 1.4rem;
+  font-size: 0.9rem;
+  font-variation-settings: 'wdth' 88, 'wght' 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+}
+
+.btn--ghost:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ─── Açılış dizilimi: sadece bir kez, sayfa yüklenirken ─── */
+
+.rise {
+  display: block;
+  overflow: hidden;
+}
+
+.rise > span {
+  display: block;
+  transform: translateY(104%);
+}
+
+[data-intro='done'] .rise > span {
+  animation: rise 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes rise {
+  to {
+    transform: none;
+  }
+}
+
+/* ─── Bölüm görünürlüğü: ince, tek yönlü ─── */
+
+.enter {
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+
+.enter[data-seen='true'] {
+  opacity: 1;
+}
+
+/* ─── Hareket azaltma tercihi ─── */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .rise > span {
+    transform: none;
+  }
+
+  .enter {
+    opacity: 1;
+  }
 }
