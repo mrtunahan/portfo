@@ -17,7 +17,16 @@
   --ink: #141519;
   --mute: #6e6f76;
   --rule: #deddd6;
-  --accent: #1f3cf0;
+
+  /* Vurgu: mürekkep mavisi. Hover ve aktif tonları tabandan OKLCH'de
+     yalnızca koyuluk düşürülerek türetildi; ton ve kroma sabit. */
+  --accent: #1043a8; /* bağlantı, aktif menü, işaret çizgisi */
+  --accent-hover: #002f8d; /* buton üzerine gelince */
+  --accent-active: #00226c; /* basılı an */
+  --accent-on: #eef2f9; /* dolgu üstündeki metin */
+  --accent-ring: #2a58b2; /* klavye odak halkası */
+  --accent-soft: #e8f1ff; /* bilgi kutusu, seçili satır zemini */
+  --accent-line: rgba(16, 67, 168, 0.16); /* ızgara göstergesi */
 
   --gutter: clamp(1.25rem, 4vw, 4.5rem);
   --spine: 0px; /* JS ızgara göstergesi için */
@@ -43,7 +52,7 @@ body {
 
 /* Okuma akışını bozmayan, görünür odak halkası */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-ring);
   outline-offset: 3px;
 }
 
@@ -77,11 +86,11 @@ body {
 }
 
 .grid-overlay__col {
-  border-left: 1px solid rgba(31, 60, 240, 0.16);
+  border-left: 1px solid var(--accent-line);
 }
 
 .grid-overlay__col:last-child {
-  border-right: 1px solid rgba(31, 60, 240, 0.16);
+  border-right: 1px solid var(--accent-line);
 }
 
 /* ─── Tipografi ölçeği ─── */
@@ -246,8 +255,15 @@ body {
 }
 
 .btn:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--accent-on);
+}
+
+.btn:active {
+  background: var(--accent-active);
+  border-color: var(--accent-active);
+  color: var(--accent-on);
 }
 
 .btn--ghost {
