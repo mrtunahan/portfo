@@ -7,12 +7,32 @@
       name="description"
       content="A. Tunahan Korkmaz — yazılım geliştirme ve akademik araştırma. Full-stack projeler ve TÜBİTAK destekli yapay zekâ çalışmaları."
     />
-    <meta name="theme-color" content="#FAFAF8" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>A. Tunahan Korkmaz</title>
+    <script>
+      // Tema sınıfını React yüklenmeden önce uygula; aksi halde koyu temada
+      // bir kare beyaz yanıp söner.
+      (function () {
+        try {
+          var s = localStorage.getItem('portfo:theme');
+          var dark =
+            s === 'dark' ||
+            ((!s || s === 'system') &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+          }
+        } catch (e) {
+          /* depolama kapalı olabilir */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
